@@ -1,0 +1,128 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import GlassCard from '../components/GlassCard.astro';
+import Icon from '../components/Icon.astro';
+import Button from '../components/Button.astro';
+
+const resources = [
+  {
+    icon: 'github',
+    title: 'GitHub Repository',
+    description: 'Browse source code, star the project, submit PRs',
+    link: 'https://github.com/watzon/pindrop'
+  },
+  {
+    icon: 'sparkles',
+    title: 'Discussions',
+    description: 'Ask questions, share ideas, get community support',
+    link: 'https://github.com/watzon/pindrop/discussions'
+  },
+  {
+    icon: 'shield',
+    title: 'Report Issues',
+    description: 'Found a bug? Report it on our issue tracker',
+    link: 'https://github.com/watzon/pindrop/issues'
+  }
+];
+
+const faqItems = [
+  {
+    question: 'Does Pindrop work on Intel Macs?',
+    answer: 'Yes, Pindrop works on Intel Macs, but it is highly optimized for Apple Silicon (M1/M2/M3) chips using the Neural Engine for best performance and battery life.'
+  },
+  {
+    question: 'Is my data sent anywhere?',
+    answer: 'Transcription is 100% local—your voice never leaves your Mac. Optional AI enhancement can be configured to use external services (OpenAI, OpenRouter) or kept local with Ollama, LM Studio, or other local providers. You control where your data goes.'
+  },
+  {
+    question: 'What languages are supported?',
+    answer: 'Currently, Pindrop is optimized for English transcription. We are exploring support for additional languages in future updates.'
+  }
+];
+---
+
+<Layout title="Community & Support - Pindrop">
+  <div class="relative overflow-hidden min-h-screen flex flex-col">
+    <!-- Background Gradients -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-orange/20 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-50"></div>
+    <div class="absolute top-[20%] right-0 w-[800px] h-[600px] bg-brand-pink/20 rounded-full blur-[100px] -z-10 mix-blend-screen opacity-40"></div>
+    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-magenta/20 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-40"></div>
+
+    <Header />
+
+    <main class="flex-grow pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto space-y-24 w-full">
+      
+      <!-- Hero Section -->
+      <section class="flex flex-col items-center text-center space-y-6 animate-fade-in">
+        <h1 class="text-4xl md:text-6xl font-display font-bold tracking-tight text-white max-w-4xl leading-tight">
+          Community & <span class="gradient-text">Support</span>
+        </h1>
+        
+        <p class="text-xl text-text-secondary max-w-2xl leading-relaxed">
+          Get help, report issues, and connect with other users. Pindrop is built by the community, for the community.
+        </p>
+      </section>
+
+      <!-- Resource Cards -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {resources.map(resource => (
+          <a href={resource.link} target="_blank" rel="noopener noreferrer" class="block h-full">
+            <GlassCard class="h-full flex flex-col items-start gap-4 p-6 hover:bg-white/5 transition-colors group border-white/5 hover:border-brand-pink/30">
+              <div class="p-3 rounded-lg bg-gradient-to-br from-brand-orange/20 to-brand-pink/20 text-brand-orange ring-1 ring-white/10 group-hover:scale-110 transition-transform duration-300">
+                <Icon name={resource.icon as any} size={28} />
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand-pink transition-colors">{resource.title}</h3>
+                <p class="text-sm text-text-secondary leading-relaxed">{resource.description}</p>
+              </div>
+            </GlassCard>
+          </a>
+        ))}
+      </section>
+
+      <!-- Contributing Section -->
+      <section class="relative rounded-3xl glass border border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-orange/10 via-brand-pink/10 to-brand-magenta/10 opacity-50"></div>
+        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div class="space-y-4 max-w-2xl text-center md:text-left">
+            <h2 class="text-3xl font-display font-bold text-white">Want to contribute?</h2>
+            <p class="text-text-secondary text-lg">
+              We welcome contributions of all kinds! Whether it's fixing bugs, improving documentation, or suggesting new features, your help makes Pindrop better.
+            </p>
+            <div class="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
+              <a href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md" target="_blank" class="text-brand-orange hover:text-brand-pink transition-colors font-medium underline-offset-4 hover:underline">Read Contributing Guide</a>
+              <span class="text-white/20">•</span>
+              <a href="https://github.com/watzon/pindrop/blob/main/CODE_OF_CONDUCT.md" target="_blank" class="text-brand-orange hover:text-brand-pink transition-colors font-medium underline-offset-4 hover:underline">Code of Conduct</a>
+            </div>
+          </div>
+          <div class="flex-shrink-0">
+            <Button href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md" size="lg" icon="github" variant="primary" external>
+              View Contributing Guide
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="max-w-3xl mx-auto w-full space-y-8">
+        <div class="text-center space-y-4">
+          <h2 class="text-3xl font-display font-bold text-white">Frequently Asked Questions</h2>
+        </div>
+        
+        <div class="space-y-4">
+          {faqItems.map(item => (
+            <GlassCard class="p-6 hover:bg-white/5 transition-colors" hoverEffect={false}>
+              <h3 class="text-lg font-bold text-white mb-2">{item.question}</h3>
+              <p class="text-text-secondary leading-relaxed">{item.answer}</p>
+            </GlassCard>
+          ))}
+        </div>
+      </section>
+
+    </main>
+
+    <Footer />
+  </div>
+</Layout>
