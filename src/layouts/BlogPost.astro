@@ -1,0 +1,136 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  version?: string;
+  tags?: string[];
+}
+
+const { title, description, date, version, tags } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout title={`${title} - Pindrop Blog`} description={description}>
+  <div class="relative min-h-screen flex flex-col">
+    <!-- Background Gradients (Simplified from index) -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-orange/10 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-30 pointer-events-none"></div>
+    <div class="fixed bottom-0 right-0 w-[800px] h-[600px] bg-brand-pink/10 rounded-full blur-[100px] -z-10 mix-blend-screen opacity-20 pointer-events-none"></div>
+
+    <Header />
+
+    <main class="flex-grow pt-32 pb-20 px-6 md:px-12 max-w-3xl mx-auto w-full">
+      <a 
+        href="/blog" 
+        class="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-white transition-colors mb-12 group"
+      >
+        <div class="p-1.5 rounded-full bg-surface-800 border border-white/10 group-hover:bg-surface-700 transition-colors group-hover:-translate-x-1 duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+        </div>
+        Back to Blog
+      </a>
+
+      <article>
+        <header class="text-center mb-16 space-y-6">
+          <div class="flex items-center justify-center gap-4 text-sm text-text-muted">
+            <time datetime={date.toISOString()}>{formattedDate}</time>
+            {version && (
+              <span class="px-3 py-1 rounded-full bg-brand-pink/10 text-brand-pink border border-brand-pink/20 text-xs font-mono font-medium">
+                v{version}
+              </span>
+            )}
+          </div>
+          
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-[1.1] tracking-tight">
+            {title}
+          </h1>
+          
+          <p class="text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+            {description}
+          </p>
+        </header>
+        
+        <div class="blog-content">
+          <slot />
+        </div>
+      </article>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  @reference "../styles/global.css";
+  
+  .blog-content {
+    @apply text-lg text-text-secondary leading-relaxed;
+  }
+
+  .blog-content :global(h2) {
+    @apply text-2xl md:text-3xl font-display font-bold text-white mt-16 mb-6 scroll-mt-32;
+  }
+
+  .blog-content :global(h3) {
+    @apply text-xl md:text-2xl font-display font-bold text-white mt-10 mb-4 scroll-mt-32;
+  }
+
+  .blog-content :global(p) {
+    @apply mb-6;
+  }
+
+  .blog-content :global(ul) {
+    @apply list-disc list-outside ml-6 mb-8 space-y-2;
+  }
+
+  .blog-content :global(ol) {
+    @apply list-decimal list-outside ml-6 mb-8 space-y-2;
+  }
+
+  .blog-content :global(li) {
+    @apply pl-2 marker:text-brand-orange/70;
+  }
+
+  .blog-content :global(a) {
+    @apply text-brand-pink hover:text-brand-magenta transition-colors underline decoration-brand-pink/30 hover:decoration-brand-magenta underline-offset-4;
+  }
+
+  .blog-content :global(strong) {
+    @apply text-white font-semibold;
+  }
+
+  .blog-content :global(blockquote) {
+    @apply border-l-4 border-brand-orange/50 pl-6 py-1 my-8 italic text-text-muted bg-surface-800/30 rounded-r-lg;
+  }
+
+  .blog-content :global(code) {
+    @apply font-mono text-sm bg-surface-800 text-brand-orange px-1.5 py-0.5 rounded border border-white/10;
+  }
+
+  .blog-content :global(pre) {
+    @apply bg-surface-800 p-6 rounded-xl border border-white/10 overflow-x-auto mb-8 text-sm leading-relaxed;
+  }
+
+  .blog-content :global(pre code) {
+    @apply bg-transparent p-0 text-text-primary border-none text-sm;
+  }
+
+  .blog-content :global(img) {
+    @apply rounded-xl border border-white/10 shadow-lg my-8 w-full h-auto;
+  }
+
+  .blog-content :global(hr) {
+    @apply border-white/10 my-12;
+  }
+</style>

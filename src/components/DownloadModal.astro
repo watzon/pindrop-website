@@ -1,0 +1,184 @@
+---
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+---
+
+<div id="download-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-surface-900/80 backdrop-blur-md transition-opacity duration-300 opacity-0" id="modal-backdrop"></div>
+
+  <!-- Modal Content -->
+  <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl transform transition-all duration-300 scale-95 opacity-0" id="modal-panel">
+      
+      <!-- Glass Card Effect -->
+      <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-surface-900/40 shadow-2xl backdrop-blur-xl">
+        
+        <!-- Background Gradients -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-orange/20 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-brand-pink/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <!-- Close Button -->
+        <button id="modal-close" class="absolute top-4 right-4 p-2 text-text-muted hover:text-white transition-colors rounded-full hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-brand-pink/50">
+          <Icon name="x" size={20} />
+          <span class="sr-only">Close</span>
+        </button>
+
+        <div class="p-8 md:p-10 text-center space-y-8">
+          
+          <!-- Header -->
+          <div class="space-y-2">
+            <h2 id="modal-title" class="text-3xl md:text-4xl font-display font-bold text-white">
+              Thank you for downloading!
+            </h2>
+            <p class="text-text-secondary text-lg">
+              Your download should start automatically.
+            </p>
+          </div>
+
+          <!-- CTA Grid -->
+          <div class="grid md:grid-cols-2 gap-6 pt-4">
+            
+            <!-- GitHub Star Column -->
+            <div class="flex flex-col items-center justify-between p-6 rounded-xl bg-white/5 border border-white/10 hover:border-brand-orange/30 transition-colors gap-4">
+              <div class="space-y-2">
+                <div class="inline-flex p-3 rounded-full bg-surface-800 text-white shadow-lg mb-2">
+                  <Icon name="github" size={32} />
+                </div>
+                <h3 class="text-xl font-bold text-white">Star on GitHub</h3>
+                <p class="text-sm text-text-secondary">
+                  Enjoying Pindrop? Give us a star to help others find it.
+                </p>
+              </div>
+              <Button href="https://github.com/watzon/pindrop" variant="secondary" icon="github" external class="w-full justify-center">
+                Star Project
+              </Button>
+            </div>
+
+            <!-- Donate Column -->
+            <div class="flex flex-col items-center justify-between p-6 rounded-xl bg-white/5 border border-white/10 hover:border-brand-pink/30 transition-colors gap-4">
+              <div class="space-y-2">
+                <div class="inline-flex p-3 rounded-full bg-gradient-to-br from-brand-orange to-brand-pink text-white shadow-lg mb-2">
+                  <Icon name="heart" size={32} />
+                </div>
+                <h3 class="text-xl font-bold text-white">Support Dev</h3>
+                <p class="text-sm text-text-secondary">
+                  Help sustain development and new features.
+                </p>
+              </div>
+              <div class="flex flex-col gap-3 w-full">
+                <Button href="https://github.com/sponsors/watzon" variant="gradient" icon="heart" external class="w-full justify-center">
+                  GitHub Sponsors
+                </Button>
+                <a href="https://ko-fi.com/watzon" target="_blank" rel="noopener noreferrer" class="text-sm text-text-muted hover:text-brand-pink transition-colors font-medium">
+                  Or donate via Ko-Fi &rarr;
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Dismiss -->
+          <div>
+            <button id="modal-dismiss" class="text-text-muted hover:text-white text-sm transition-colors hover:underline">
+              No thanks, just take me to the download
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getElements() {
+    return {
+      modal: document.getElementById('download-modal'),
+      backdrop: document.getElementById('modal-backdrop'),
+      panel: document.getElementById('modal-panel')
+    };
+  }
+
+  function openDownloadModal(url: string) {
+    const { modal, backdrop, panel } = getElements();
+    if (!modal || !backdrop || !panel) return;
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    // Prevent scrolling
+    document.body.style.overflow = 'hidden';
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      backdrop.classList.remove('opacity-0');
+      panel.classList.remove('scale-95', 'opacity-0');
+      panel.classList.add('scale-100', 'opacity-100');
+    });
+
+    // Start download
+    const link = document.createElement('a');
+    link.href = url;
+    // link.download = ''; // Removed because it might be cross-origin
+    link.target = '_blank'; // Ensure it doesn't navigate away if not an attachment
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function closeDownloadModal() {
+    const modal = document.getElementById('download-modal');
+    const backdrop = document.getElementById('modal-backdrop');
+    const panel = document.getElementById('modal-panel');
+    
+    if (!modal || !backdrop || !panel) return;
+
+    // Animate out
+    backdrop.classList.add('opacity-0');
+    panel.classList.remove('scale-100', 'opacity-100');
+    panel.classList.add('scale-95', 'opacity-0');
+
+    // Hide after animation
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  // Expose to window
+  declare global {
+    interface Window {
+      openDownloadModal: (url: string) => void;
+    }
+  }
+  window.openDownloadModal = openDownloadModal;
+
+  // Setup event listeners
+  function setupListeners() {
+    const modal = document.getElementById('download-modal');
+    const closeBtn = document.getElementById('modal-close');
+    const dismissBtn = document.getElementById('modal-dismiss');
+
+    if (closeBtn) closeBtn.onclick = closeDownloadModal;
+    if (dismissBtn) dismissBtn.onclick = closeDownloadModal;
+    
+    if (modal) {
+      modal.onclick = (e) => {
+        if (e.target === modal) closeDownloadModal();
+      };
+    }
+  }
+
+  // Initialize on load and after view transitions
+  document.addEventListener('astro:page-load', setupListeners);
+  
+  // Escape key listener (only needs to be added once if script persists, but safe to re-add? No, duplicate listeners.)
+  // Better to use a named function or check if added.
+  // Actually, module scripts run once. So this runs once.
+  document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('download-modal');
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      closeDownloadModal();
+    }
+  });
+</script>

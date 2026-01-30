@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Pindrop Design System - Tailwind CSS 4 Theme */
+@theme {
+  /* Brand Colors - Orange to Pink to Magenta gradient palette */
+  --color-brand-orange: #f97316;
+  --color-brand-pink: #ec4899;
+  --color-brand-magenta: #d946ef;
+  --color-brand-red: #ef4444;
+  
+  /* Dark Theme Base */
+  --color-surface-900: #0a0a0b;
+  --color-surface-800: #111113;
+  --color-surface-700: #1a1a1d;
+  --color-surface-600: #242428;
+  --color-surface-500: #2e2e33;
+  --color-surface-400: #3d3d44;
+  
+  /* Text Colors */
+  --color-text-primary: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  
+  /* Glass Effect Colors */
+  --color-glass-bg: rgba(255, 255, 255, 0.03);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-hover: rgba(255, 255, 255, 0.06);
+  
+  /* Gradient definitions */
+  --gradient-brand: linear-gradient(135deg, var(--color-brand-orange) 0%, var(--color-brand-pink) 50%, var(--color-brand-magenta) 100%);
+  --gradient-brand-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(236, 72, 153, 0.15) 50%, rgba(217, 70, 239, 0.15) 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(249, 115, 22, 0.3) 0%, rgba(236, 72, 153, 0.2) 30%, transparent 70%);
+  
+  /* Shadows */
+  --shadow-glow-sm: 0 0 20px rgba(249, 115, 22, 0.15), 0 0 40px rgba(236, 72, 153, 0.1);
+  --shadow-glow-md: 0 0 40px rgba(249, 115, 22, 0.2), 0 0 80px rgba(236, 72, 153, 0.15);
+  --shadow-glow-lg: 0 0 60px rgba(249, 115, 22, 0.25), 0 0 120px rgba(236, 72, 153, 0.2);
+  
+  /* Typography */
+  --font-display: "SF Pro Display", "Inter", system-ui, -apple-system, sans-serif;
+  --font-body: "SF Pro Text", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+  
+  /* Spacing Scale */
+  --spacing-section: 8rem;
+  --spacing-component: 4rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  
+  /* Animation */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-surface-900);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection */
+::selection {
+  background: rgba(249, 115, 22, 0.3);
+  color: white;
+}
+
+/* Glass Card Utility */
+.glass {
+  background: var(--color-glass-bg);
+  border: 1px solid var(--color-glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass:hover {
+  background: var(--color-glass-hover);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow Effects */
+.glow-sm { box-shadow: var(--shadow-glow-sm); }
+.glow-md { box-shadow: var(--shadow-glow-md); }
+.glow-lg { box-shadow: var(--shadow-glow-lg); }
+
+/* View Transitions */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: var(--ease-out-expo);
+}

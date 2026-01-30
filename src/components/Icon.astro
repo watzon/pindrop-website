@@ -1,0 +1,99 @@
+---
+export interface Props {
+  name: 'mic' | 'download' | 'shield' | 'zap' | 'sparkles' | 'keyboard' | 'github' | 'apple' | 'heart' | 'x';
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 24, class: className = '' } = Astro.props;
+---
+
+<svg 
+  xmlns="http://www.w3.org/2000/svg" 
+  width={size} 
+  height={size} 
+  viewBox="0 0 24 24" 
+  fill="none" 
+  stroke="currentColor" 
+  stroke-width="2" 
+  stroke-linecap="round" 
+  stroke-linejoin="round"
+  class={className}
+>
+  {name === 'mic' && (
+    <>
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </>
+  )}
+  
+  {name === 'download' && (
+    <>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </>
+  )}
+  
+  {name === 'shield' && (
+    <>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    </>
+  )}
+  
+  {name === 'zap' && (
+    <>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </>
+  )}
+  
+  {name === 'sparkles' && (
+    <>
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+    </>
+  )}
+  
+  {name === 'keyboard' && (
+    <>
+      <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+      <line x1="6" y1="8" x2="6" y2="8"></line>
+      <line x1="10" y1="8" x2="10" y2="8"></line>
+      <line x1="14" y1="8" x2="14" y2="8"></line>
+      <line x1="18" y1="8" x2="18" y2="8"></line>
+      <line x1="6" y1="12" x2="6" y2="12"></line>
+      <line x1="10" y1="12" x2="10" y2="12"></line>
+      <line x1="14" y1="12" x2="14" y2="12"></line>
+      <line x1="18" y1="12" x2="18" y2="12"></line>
+      <line x1="6" y1="16" x2="6" y2="16"></line>
+      <line x1="10" y1="16" x2="14" y2="16"></line>
+      <line x1="18" y1="16" x2="18" y2="16"></line>
+    </>
+  )}
+  
+  {name === 'github' && (
+    <>
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+    </>
+  )}
+  
+  {name === 'apple' && (
+    <>
+      <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-8s-3-2-3-6 2-4.5 5-5.63c-2-2.75-5.5-3.37-7.5-3.37-2.75 0-3.75 1.5-3.75 1.5s-1-1.5-4-1.5c-3.13 0-6 2.5-6 6.5 0 5.12 3.87 13.5 7.5 13.5 1.75 0 2.5-1.06 3.75-1.06zm-1-17c1.13-1.38 1-4 1-4s-2.5.38-3.75 1.88c-1 1.25-1 4-1 4s2.5-.38 3.75-1.88z"></path>
+    </>
+  )}
+  
+  {name === 'heart' && (
+    <>
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </>
+  )}
+
+  {name === 'x' && (
+    <>
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </>
+  )}
+</svg>
