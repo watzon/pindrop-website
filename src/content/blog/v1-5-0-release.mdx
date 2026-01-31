@@ -1,0 +1,74 @@
+---
+title: "Pindrop v1.5.0: Multi-Engine Support with Parakeet ASR"
+description: "Major release introducing pluggable transcription engines, Parakeet integration via FluidAudio SDK, and enhanced audio capabilities including VAD, diarization, and streaming."
+date: 2026-01-30
+version: "1.5.0"
+tags: ["release", "v1.5", "parakeet", "fluidaudio", "multi-engine"]
+---
+
+We're excited to announce **Pindrop v1.5.0**, a significant evolution in our quest to provide the best offline dictation experience for macOS. This release introduces a major architectural change: support for multiple transcription engines, starting with integration of the high-performance Parakeet ASR models.
+
+## Multi-Engine Architecture
+
+The biggest change in v1.5.0 is under the hood. We've restructured the transcription system around a new `TranscriptionEngine` protocol, allowing Pindrop to support multiple ASR backends:
+
+- **WhisperKitEngine** — Our battle-tested WhisperKit integration (default)
+- **ParakeetEngine** — New high-performance option using FluidAudio SDK
+
+This modular design means we can now add support for additional engines without rewriting the entire app. You can switch engines at runtime from Settings → Models, and each engine can expose its own capabilities and model options.
+
+## Parakeet ASR via FluidAudio
+
+We're now shipping with support for [Parakeet ASR models](https://github.com/ai4bharat/Parakeet) through the [FluidAudio SDK](https://github.com/FluidInference/FluidAudio):
+
+- **Parakeet V2** — Optimized for English, ~2x faster than Whisper while maintaining accuracy
+- **Parakeet V3** — Multilingual support coming soon
+
+Parakeet models are particularly impressive on Apple Silicon, utilizing the Neural Engine for real-time transcription with minimal CPU impact. To try it:
+
+1. Open Settings → Models
+2. Download the Parakeet V2 model (~150MB)
+3. Select it as your active model
+4. The engine switches automatically
+
+## Extended Audio Capabilities
+
+We've laid the groundwork for advanced audio features with new protocol definitions:
+
+- **Voice Activity Detection (VAD)** — Automatically pause recording during silence
+- **Speaker Diarization** — Identify different speakers in transcripts (coming in v1.6)
+- **Streaming Transcription** — Real-time word-by-word output (Parakeet only)
+- **Text-to-Speech** — Foundation for future voice feedback features
+
+These capabilities are exposed through the engine system, so each ASR backend can advertise what it supports. WhisperKit provides VAD and language detection; Parakeet adds streaming and will support diarization in upcoming updates.
+
+## Feature Model Downloads
+
+Optional "feature models" can now be downloaded separately from transcription models:
+
+- VAD models for silence detection
+- Diarization models for speaker identification
+- Streaming enhancement models
+
+Enable features in Settings → Feature Models, and Pindrop downloads the required components on first use.
+
+## UI Polish
+
+Small details matter:
+
+- **SF Symbols** throughout the status bar menu for better visual scanning
+- **Active model indicator** — Green dot shows which model is currently loaded
+- **Provider badges** in the model picker (WhisperKit, Parakeet, etc.)
+- Cleaner Settings menu organization
+
+## What's Next
+
+We're actively working on **OTA Updates** — automatic in-app updates so you always have the latest improvements without manually downloading releases.
+
+## Upgrade Notes
+
+v1.5.0 is fully backward compatible. Your existing WhisperKit models continue to work exactly as before. If you want to try Parakeet, simply download it from Settings.
+
+**Download:** [GitHub Releases](https://github.com/watzon/pindrop/releases/tag/v1.5.0)
+
+As always, feedback is welcome. Happy dictating!
