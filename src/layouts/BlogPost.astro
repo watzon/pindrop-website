@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import screenshot from '../assets/images/screenshot.png';
 
 interface Props {
   title: string;
@@ -18,10 +19,36 @@ const formattedDate = date.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+// BlogPosting structured data
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "datePublished": date.toISOString(),
+  "dateModified": date.toISOString(),
+  "author": {
+    "@type": "Organization",
+    "name": "Pindrop",
+    "url": Astro.site?.toString()
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Pindrop",
+    "logo": {
+      "@type": "ImageObject",
+      "url": new URL('/favicon.svg', Astro.site).toString()
+    }
+  },
+  "image": new URL(screenshot.src, Astro.site).toString(),
+  "keywords": tags?.join(", ") || "Pindrop, dictation, AI, macOS"
+};
 ---
 
-<Layout title={`${title} - Pindrop Blog`} description={description}>
-  <div class="relative min-h-screen flex flex-col">
+<Layout title={`${title} - Pindrop Blog`} description={description} type="article" image={screenshot.src}>
+<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+<div class="relative min-h-screen flex flex-col">
     <!-- Background Gradients (Simplified from index) -->
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-orange/10 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-30 pointer-events-none"></div>
     <div class="fixed bottom-0 right-0 w-[800px] h-[600px] bg-brand-pink/10 rounded-full blur-[100px] -z-10 mix-blend-screen opacity-20 pointer-events-none"></div>

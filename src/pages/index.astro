@@ -73,10 +73,33 @@ const features = [
     icon: 'sparkles'
   }
 ];
+
+// SoftwareApplication structured data for SEO
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Pindrop",
+  "applicationCategory": "ProductivityApplication",
+  "operatingSystem": "macOS",
+  "softwareVersion": latestVersion,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "downloadUrl": downloadUrl,
+  "featureList": features.map(f => f.title).join(", "),
+  "screenshot": new URL(screenshot.src, Astro.site).toString(),
+  "author": {
+    "@type": "Organization",
+    "name": "Pindrop"
+  }
+};
 ---
 
 <Layout title="Pindrop - Mac-Native AI Dictation">
-  <div class="relative overflow-hidden">
+<script type="application/ld+json" set:html={JSON.stringify(softwareSchema)} />
+<div class="relative overflow-hidden">
     <!-- Background Gradients -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-orange/20 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-50"></div>
     <div class="absolute top-[20%] right-0 w-[800px] h-[600px] bg-brand-pink/20 rounded-full blur-[100px] -z-10 mix-blend-screen opacity-40"></div>
