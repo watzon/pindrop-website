@@ -1,0 +1,91 @@
+---
+title: "Pindrop v1.6.0: AI Enhancement 2.0 with Context-Aware Presets"
+description: "Major AI enhancement update introducing context-aware transcription improvement, preset management system, and clipboard/screenshot capture for smarter, more relevant AI processing."
+date: 2026-02-04
+version: "1.6.0"
+tags: ["release", "v1.6", "ai-enhancement", "presets", "context-capture"]
+---
+
+We're thrilled to announce **Pindrop v1.6.0**, featuring a complete overhaul of our AI enhancement capabilities. This release introduces **AI Enhancement 2.0** — a context-aware system that makes your transcriptions smarter, more accurate, and tailored to your specific needs.
+
+## AI Enhancement 2.0
+
+The AI enhancement system has been rebuilt from the ground up with three major architectural waves:
+
+### Wave 1: Foundation
+- New `AIEnhancementService` with improved state management
+- Enhanced error handling and retry logic
+- Better integration with OpenAI-compatible APIs
+
+### Wave 2: Context Capture
+- **ContextCaptureService** — Automatically captures relevant context before transcription
+- **Clipboard monitoring** — Include your recent copy/paste history for context
+- **Screenshot capture** — Optional visual context for more accurate AI processing
+- Smart privacy controls — You choose what context to share
+
+### Wave 3: App Integration
+- Full AppCoordinator integration for seamless workflow
+- Real-time context injection during transcription
+- Improved latency and reliability
+
+## Preset Management System
+
+One of the most requested features is here: **customizable AI enhancement presets**.
+
+### Built-in Presets
+We've included several professionally crafted presets to get you started:
+
+- **General** — Balanced enhancement for everyday use
+- **Professional Email** — Formal tone, proper grammar, business-appropriate
+- **Casual Message** — Friendly, conversational tone
+- **Technical Documentation** — Precise, structured, code-aware
+- **Meeting Notes** — Action items, decisions, attendee tracking
+- **Journal Entry** — Personal, reflective, narrative style
+- **Social Media** — Engaging, concise, hashtag-friendly
+- **Code Comments** — Developer-focused, documentation style
+
+### Custom Presets
+Create your own presets with:
+- Custom system prompts
+- Temperature and creativity controls
+- Context source preferences (clipboard, screenshots, none)
+- One-click switching from the AI settings panel
+
+## Context Settings
+
+New dedicated **Context** section in AI settings:
+
+- **Enable context capture** — Toggle automatic context gathering
+- **Clipboard history** — Choose how many recent clipboard items to include
+- **Screenshot capture** — Enable/disable visual context (with privacy warning)
+- **Context window** — Control how much context is sent to the AI
+
+## UI Improvements
+
+- **Preset picker** — Beautiful dropdown with descriptions and icons
+- **Context indicators** — Visual feedback when context is being captured
+- **Enhanced settings layout** — Better organization of AI-related options
+- **Preset management sheet** — Edit, duplicate, and delete custom presets
+
+## Privacy First
+
+Context capture is **opt-in** and fully transparent:
+- All context stays on your device until transcription
+- Screenshot capture is disabled by default
+- Clear visual indicators when context is active
+- One-click disable from the menu bar
+
+## What's Next
+
+We're working on:
+- **Preset sharing** — Export and import preset configurations
+- **Smart presets** — AI-suggested presets based on your usage patterns
+- **Advanced context** — Application-aware context (e.g., knowing you're in Safari vs Xcode)
+
+## Upgrade Notes
+
+v1.6.0 is fully backward compatible. Your existing AI enhancement settings are preserved, and the new preset system includes sensible defaults that match the previous behavior.
+
+**Download:** [GitHub Releases](https://github.com/watzon/pindrop/releases/tag/v1.6.0)
+
+As always, we love hearing your feedback. Happy dictating!
