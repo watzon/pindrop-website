@@ -11,20 +11,20 @@ import screenshot from '../assets/images/screenshot.png';
 
 // Fetch latest release from GitHub at build time
 let latestVersion = 'v1.0';
-let downloadUrl = 'https://github.com/watzon/pindrop/releases/latest/download/Pindrop.dmg';
+let downloadUrl = 'https://github.com/watzon/pindrop/releases/latest';
 try {
   const response = await fetch('https://api.github.com/repos/watzon/pindrop/releases/latest');
   if (response.ok) {
     const data = await response.json();
     latestVersion = data.tag_name || 'v1.0';
-    // Find the Pindrop.dmg asset in the release
-    const dmgAsset = data.assets?.find((asset: any) => asset.name === 'Pindrop.dmg');
+    // Find the .dmg asset (named Pindrop-x.x.x.dmg)
+    const dmgAsset = data.assets?.find((asset: any) => asset.name.endsWith('.dmg'));
     if (dmgAsset?.browser_download_url) {
       downloadUrl = dmgAsset.browser_download_url;
     }
   }
 } catch (e) {
-  // Fallback to static values if API fails
+  // Fallback to releases page if API fails
   console.warn('Failed to fetch latest release from GitHub:', e);
 }
 
