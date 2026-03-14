@@ -1,0 +1,124 @@
+---
+title: "Pindrop v1.11.0: Code-Signed & Ready for Prime Time"
+description: "The big one. Pindrop is now officially code-signed, eliminating unsigned binary warnings. Plus streaming transcription, media file support, speaker diarization, and a brand new Bubble indicator."
+date: 2026-03-13
+version: "1.11.0"
+tags: ["release", "v1.11", "signed", "streaming", "media", "diarization"]
+---
+
+It's been a busy few weeks since our last update, and we've got some major news: **Pindrop v1.11.0 is now fully code-signed**. This means no more scary "untrusted developer" warnings when you install or update the app. Just download, drag to Applications, and go.
+
+But that's not all—we've packed five releases worth of improvements into this announcement. Let's dive in.
+
+## Code-Signed & Distributed
+
+The headline feature of v1.11.0 is proper macOS code signing. This has been a long-requested change that removes friction from the installation process:
+
+- **No more Gatekeeper warnings** — macOS recognizes Pindrop as a trusted application
+- **Seamless updates** — Future updates will install without permission prompts
+- **Apple Developer ID** — Signed with our official Apple Developer certificate
+
+### ⚠️ Important Upgrade Notes
+
+Because this release switches to a new signed app identity, your existing settings will reset and need to be reconfigured. macOS will also ask you to grant Microphone and Accessibility permissions again.
+
+If you run into permission issues after upgrading, you can reset them from Terminal:
+
+```bash
+tccutil reset Microphone tech.watzon.pindrop
+tccutil reset Accessibility tech.watzon.pindrop
+```
+
+Then relaunch Pindrop and grant permissions fresh.
+
+## Streaming Transcription (v1.9.0)
+
+You no longer have to wait until you finish speaking to see results. With the new **streaming transcription** feature, text appears word-by-word as you dictate:
+
+- Real-time output while recording
+- Reduced perceived latency
+- Works alongside AI enhancement
+- Toggle in Settings → Transcription
+
+## Speaker Diarization (v1.9.0)
+
+Recording meetings or conversations? Speaker diarization automatically separates and labels different speakers in your transcripts:
+
+- "Speaker 1", "Speaker 2" attribution
+- Works with both live recordings and imported media
+- Perfect for meeting notes and interviews
+- Enable in Settings → Feature Models
+
+## Transcribe Media Files (v1.10.0)
+
+Pindrop can now transcribe audio and video files, not just live dictation:
+
+### Supported Sources
+- **Local files** — MP3, MP4, WAV, M4A, MOV, and more
+- **Web links** — YouTube URLs and other supported platforms (via yt-dlp)
+
+### Media Library
+Imported and downloaded media appears in a dedicated library with:
+- Thumbnail previews
+- Searchable metadata
+- Folder organization
+- Progress tracking during import/download
+
+### Speaker Diarization for Media
+Multi-speaker recordings get the same diarization treatment as live recordings, making it easy to follow who said what.
+
+## New Bubble Indicator (v1.9.2)
+
+In addition to the Notch and Pill styles, we've added a **Bubble** floating indicator that appears beside the focused text field or caret:
+
+- More contextual placement
+- Less obtrusive than Notch
+- Choose your style in Settings → Appearance
+
+The indicator system has also been polished with better drag behavior and more reliable state syncing during recording.
+
+## Fn/Globe Key Support (v1.9.3)
+
+You can now use the Mac **Fn/Globe key** by itself as a push-to-talk hotkey. This is perfect if you want a dedicated dictation key without sacrificing other shortcuts.
+
+## Stability & Performance Improvements
+
+### Keyboard Monitoring (v1.10.1)
+Fixed a bug where granting Accessibility permission while Pindrop was running could make system input sluggish. The fix involved:
+- Moving CGEventTap monitors off the main run loop
+- Better event-tap recovery with backoff
+- Full monitor recreation to prevent tight loops
+
+### Accessibility Permissions (v1.9.1)
+Fixed repeated permission prompts after installing from DMG by hardening app bundle re-signing and adding strict deep-signature verification.
+
+### Transcript Output
+Refined clipboard and direct insert behavior for more consistent results across different applications.
+
+### UI Polish
+- Better history view
+- Improved toast notifications
+- Settings flow refinements
+- Built-in dictionary is now easier to access
+- Pindrop can automatically learn word corrections as you use it
+
+## What's Next
+
+With code signing complete, we're focusing on:
+- **Smarter AI enhancement** — Better context awareness and preset suggestions
+- **Advanced media features** — Batch transcription and export options
+- **Plugin system** — Third-party extensions for custom workflows
+
+## Changelog Summary
+
+**v1.11.0** — Code-signed distribution, AI enhancement overhaul, dictionary improvements  
+**v1.10.1** — Keyboard monitor recovery fixes  
+**v1.10.0** — Transcribe Media workflow with file and web link support  
+**v1.9.3** — Fn/Globe key as PTT hotkey  
+**v1.9.2** — Bubble floating indicator  
+**v1.9.1** — Accessibility permission prompt fixes  
+**v1.9.0** — Streaming transcription and speaker diarization
+
+**Download:** [GitHub Releases](https://github.com/watzon/pindrop/releases/tag/v1.11.0)
+
+Thanks for your patience as we worked through the signing process. Here's to many more releases without scary security warnings! 🎉
