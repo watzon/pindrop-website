@@ -3,7 +3,7 @@ import Icon from './Icon.astro';
 
 interface Props {
   href: string;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'gradient';
+  variant?: 'primary' | 'secondary' | 'ghost';
   icon?: string;
   external?: boolean;
   class?: string;
@@ -21,19 +21,18 @@ const {
   'data-download-trigger': downloadTrigger
 } = Astro.props;
 
-const baseStyles = "inline-flex items-center justify-center font-medium rounded-full transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-brand-orange/50 focus:ring-offset-2 focus:ring-offset-surface-900";
+const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-cream";
 
 const variantStyles = {
-  primary: "bg-white text-surface-900 hover:bg-gray-100 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]",
-  secondary: "bg-surface-800 text-white border border-surface-700 hover:bg-surface-700 hover:border-surface-600",
-  ghost: "text-text-secondary hover:text-white hover:bg-white/5",
-  gradient: "bg-gradient-to-r from-brand-orange via-brand-pink to-brand-magenta text-white hover:shadow-glow-md hover:scale-105 border border-white/20"
+  primary: "bg-dark text-cream hover:bg-dark-surface shadow-sm hover:shadow-md",
+  secondary: "bg-surface text-text-primary border border-border hover:bg-border hover:border-text-muted",
+  ghost: "text-text-secondary hover:text-text-primary hover:bg-surface"
 };
 
 const sizeStyles = {
-  sm: "text-sm px-4 py-1.5 gap-1.5",
-  md: "text-base px-6 py-2.5 gap-2",
-  lg: "text-lg px-8 py-3.5 gap-2.5"
+  sm: "text-sm px-4 py-2 gap-2",
+  md: "text-base px-5 py-2.5 gap-2",
+  lg: "text-lg px-7 py-3.5 gap-2.5"
 };
 
 const combinedClass = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
@@ -47,6 +46,6 @@ const combinedClass = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size
   data-download-trigger={downloadTrigger}
   onclick={downloadTrigger ? `event.preventDefault(); window.openDownloadModal('${downloadTrigger}')` : undefined}
 >
-  {icon && <Icon name={icon as any} size={size === 'sm' ? 16 : size === 'md' ? 20 : 24} />}
+  {icon && <Icon name={icon as any} size={size === 'sm' ? 16 : size === 'md' ? 18 : 22} />}
   <slot />
 </a>

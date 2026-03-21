@@ -3,13 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Button from '../components/Button.astro';
-import FeatureCard from '../components/FeatureCard.astro';
-import GlassCard from '../components/GlassCard.astro';
 import Icon from '../components/Icon.astro';
 import { Image } from 'astro:assets';
 import screenshot from '../assets/images/screenshot.png';
 
-// Fetch latest release from GitHub at build time
 let latestVersion = 'v1.0';
 let downloadUrl = 'https://github.com/watzon/pindrop/releases/latest';
 try {
@@ -17,64 +14,124 @@ try {
   if (response.ok) {
     const data = await response.json();
     latestVersion = data.tag_name || 'v1.0';
-    // Find the .dmg asset (named Pindrop-x.x.x.dmg)
     const dmgAsset = data.assets?.find((asset: any) => asset.name.endsWith('.dmg'));
     if (dmgAsset?.browser_download_url) {
       downloadUrl = dmgAsset.browser_download_url;
     }
   }
 } catch (e) {
-  // Fallback to releases page if API fails
-  console.warn('Failed to fetch latest release from GitHub:', e);
 }
-
-const valuePillars = [
-  {
-    icon: 'apple',
-    title: 'Mac-Native',
-    description: 'Built with pure Swift and SwiftUI. Not a web wrapper. Feels right at home on macOS.'
-  },
-  {
-    icon: 'shield',
-    title: 'Privacy-First',
-    description: '100% local transcription. Your voice never leaves your Mac. No cloud, no tracking.'
-  },
-  {
-    icon: 'zap',
-    title: 'Apple Silicon Optimized',
-    description: 'Blazing fast performance using the Neural Engine. 2-3x faster than generic Whisper.'
-  },
-  {
-    icon: 'sparkles',
-    title: '100% Open Source',
-    description: 'Transparent code, MIT license. No subscriptions, no hidden costs, no lock-in.'
-  }
-];
 
 const features = [
   {
     title: 'Global Hotkeys',
-    description: 'Trigger dictation from anywhere with a customizable shortcut. Toggle mode or push-to-talk for ultimate control.',
+    description: 'Trigger dictation from anywhere with a customizable shortcut. Toggle mode or push-to-talk.',
     icon: 'keyboard'
   },
   {
     title: 'Transcription History',
-    description: 'Never lose a thought. Search through your past dictations and export them to text files or copy to clipboard.',
+    description: 'Search through your past dictations and export them to text files or copy to clipboard.',
     icon: 'mic'
   },
   {
     title: 'Multiple Models',
-    description: 'Choose the right balance of speed and accuracy. Support for Tiny, Base, Small, Medium, and Large Whisper models.',
+    description: 'Choose the right balance of speed and accuracy. From Tiny to Large Whisper models.',
     icon: 'zap'
   },
   {
     title: 'Custom Dictionary',
-    description: 'Teach Pindrop your jargon. Add custom words and phrases to improve accuracy for specialized terminology.',
+    description: 'Add custom words and phrases to improve accuracy for specialized terminology.',
     icon: 'sparkles'
   }
 ];
 
-// SoftwareApplication structured data for SEO
+const comparison = [
+  { 
+    feature: 'Pricing', 
+    pindrop: 'Free & Open Source', 
+    handy: 'Free (MIT)',
+    openwhispr: 'Free + $6.67/mo Pro',
+    superwhisper: '$8.49/mo or $249 lifetime'
+  },
+  { 
+    feature: 'Platform', 
+    pindrop: 'macOS 14+', 
+    handy: 'macOS, Windows, Linux',
+    openwhispr: 'macOS, Windows, Linux',
+    superwhisper: 'macOS, Windows, iOS'
+  },
+  { 
+    feature: 'Native App', 
+    pindrop: 'Swift/SwiftUI',
+    handy: 'Rust/Tauri',
+    openwhispr: 'Tauri',
+    superwhisper: 'Swift/SwiftUI'
+  },
+  { 
+    feature: 'ML Engine', 
+    pindrop: 'WhisperKit (CoreML)',
+    handy: 'whisper.cpp',
+    openwhispr: 'whisper.cpp',
+    superwhisper: 'llama.cpp'
+  },
+  { 
+    feature: 'Transcription History', 
+    pindrop: true,
+    handy: true,
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'AI Text Enhancement', 
+    pindrop: true,
+    handy: false,
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'Custom Vocabulary', 
+    pindrop: true,
+    handy: false,
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'Speaker Diarization', 
+    pindrop: true,
+    handy: false,
+    openwhispr: false,
+    superwhisper: true
+  },
+  { 
+    feature: 'Media Transcription', 
+    pindrop: true,
+    handy: false,
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'Push-to-Talk', 
+    pindrop: true,
+    handy: true,
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'Direct Text Insertion', 
+    pindrop: true,
+    handy: 'Clipboard only',
+    openwhispr: true,
+    superwhisper: true
+  },
+  { 
+    feature: 'Open Source', 
+    pindrop: 'MIT',
+    handy: 'MIT',
+    openwhispr: 'MIT',
+    superwhisper: false
+  },
+];
+
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -99,140 +156,252 @@ const softwareSchema = {
 
 <Layout title="Pindrop - Mac-Native AI Dictation">
 <script type="application/ld+json" set:html={JSON.stringify(softwareSchema)} />
-<div class="relative overflow-hidden">
-    <!-- Background Gradients -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-orange/20 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-50"></div>
-    <div class="absolute top-[20%] right-0 w-[800px] h-[600px] bg-brand-pink/20 rounded-full blur-[100px] -z-10 mix-blend-screen opacity-40"></div>
-    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-magenta/20 rounded-full blur-[120px] -z-10 mix-blend-screen opacity-40"></div>
 
-    <Header />
+<Header />
 
-    <main class="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto space-y-32">
-      
-      <!-- Hero Section -->
-      <section class="flex flex-col items-center text-center space-y-8 animate-fade-in">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium text-brand-orange animate-pulse-slow">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-orange"></span>
-          </span>
-          {latestVersion} Now Available
-        </div>
-        
-        <h1 class="text-5xl md:text-7xl font-display font-bold tracking-tight text-white max-w-4xl leading-tight">
-          Mac-native AI dictation. <br />
-          <span class="gradient-text">Completely private.</span>
-        </h1>
-        
-        <p class="text-xl text-text-secondary max-w-2xl leading-relaxed">
-          Experience lightning-fast, highly accurate voice typing powered by on-device AI. 
-          Optimized for Apple Silicon. Zero data leaves your machine.
-        </p>
-        
-        <div class="flex flex-col sm:flex-row items-center gap-4 pt-4">
-          <Button href={downloadUrl} data-download-trigger={downloadUrl} size="lg" icon="download" variant="gradient">
-            Download for macOS
-          </Button>
-          <Button href="https://github.com/watzon/pindrop" size="lg" icon="github" variant="secondary" external>
-            View on GitHub
-          </Button>
-        </div>
-        
-        <div class="pt-16 relative w-full max-w-5xl group">
-          <div class="shadow-glow-lg rounded-2xl overflow-hidden border border-white/10 bg-surface-800 group-hover:scale-[1.02] group-hover:shadow-glow-md transition-all duration-500 ease-out-expo">
-             <div class="relative">
-               <Image
-                src={screenshot}
-                alt="Pindrop App Screenshot"
-                width={1200}
-                height={800}
-                class="w-full h-auto object-cover block"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-surface-900 via-transparent to-transparent pointer-events-none rounded-2xl"></div>
-             </div>
+<main>
+  <!-- Hero Section -->
+  <section class="pt-40 pb-24 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="space-y-8">
+          <div class="badge animate-fade-up">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+            </span>
+            {latestVersion} Now Available
           </div>
-        </div>
-      </section>
-
-      <!-- Value Pillars -->
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {valuePillars.map(pillar => (
-          <GlassCard class="flex flex-col items-start gap-4 p-6 hover:bg-white/5 transition-colors">
-            <div class="p-3 rounded-lg bg-gradient-to-br from-brand-orange/20 to-brand-pink/20 text-brand-orange ring-1 ring-white/10">
-              <Icon name={pillar.icon as any} size={28} />
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-white mb-2">{pillar.title}</h3>
-              <p class="text-sm text-text-secondary leading-relaxed">{pillar.description}</p>
-            </div>
-          </GlassCard>
-        ))}
-      </section>
-
-      <!-- Features Section -->
-      <section id="features" class="relative">
-        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 class="text-3xl md:text-5xl font-display font-bold text-white">
-            Everything you need for <span class="gradient-text">voice productivity</span>
-          </h2>
-          <p class="text-lg text-text-secondary">
-            Powerful features designed for power users, wrapped in a beautiful native interface.
+          
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-semibold tracking-tight text-dark leading-[1.05] animate-fade-up delay-100">
+            Dictation that respects your <em class="not-italic text-accent">privacy</em>
+          </h1>
+          
+          <p class="text-xl text-text-secondary leading-relaxed max-w-lg animate-fade-up delay-200">
+            Lightning-fast, highly accurate voice typing powered by on-device AI. 
+            Optimized for Apple Silicon. Zero data leaves your machine.
+          </p>
+          
+          <div class="flex flex-wrap items-center gap-4 animate-fade-up delay-300">
+            <Button href={downloadUrl} data-download-trigger={downloadUrl} size="lg" variant="primary" icon="download">
+              Download for macOS
+            </Button>
+            <Button href="https://github.com/watzon/pindrop" size="lg" variant="secondary" icon="github" external>
+              View on GitHub
+            </Button>
+          </div>
+          
+          <p class="text-sm text-text-muted animate-fade-up delay-400">
+            Requires macOS 14+ (Sonoma) · Apple Silicon recommended
           </p>
         </div>
+        
+        <div class="relative animate-fade-up delay-200">
+          <div class="absolute -inset-4 bg-gradient-to-tr from-accent/10 via-transparent to-accent-light/20 rounded-3xl blur-2xl"></div>
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-dark/10 border border-border bg-white">
+            <Image
+              src={screenshot}
+              alt="Pindrop App Screenshot"
+              width={1200}
+              height={800}
+              class="w-full h-auto"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {features.map((feature, index) => (
-            <GlassCard class={`flex flex-col justify-between p-8 group overflow-hidden relative border-white/5 hover:border-brand-pink/30 transition-all duration-500`}>
-              <div class="absolute top-0 right-0 p-32 bg-brand-orange/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-pink/10 transition-colors duration-500"></div>
-              
-              <div class="relative z-10">
-                <div class="mb-6 inline-flex p-3 rounded-xl bg-surface-800 border border-white/10 text-brand-pink shadow-lg">
-                  <Icon name={feature.icon as any} size={32} />
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                <p class="text-text-secondary leading-relaxed text-lg">{feature.description}</p>
+  <!-- Value Props -->
+  <section class="py-24 px-6 bg-dark">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+            <Icon name="apple" size={24} />
+          </div>
+          <h3 class="font-display text-xl font-semibold text-cream">Mac-Native</h3>
+          <p class="text-text-muted text-sm leading-relaxed">
+            Built with pure Swift and SwiftUI. Not a web wrapper. Feels right at home on macOS.
+          </p>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+            <Icon name="shield" size={24} />
+          </div>
+          <h3 class="font-display text-xl font-semibold text-cream">Privacy-First</h3>
+          <p class="text-text-muted text-sm leading-relaxed">
+            100% local transcription. Your voice never leaves your Mac. No cloud, no tracking.
+          </p>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+            <Icon name="zap" size={24} />
+          </div>
+          <h3 class="font-display text-xl font-semibold text-cream">Apple Silicon</h3>
+          <p class="text-text-muted text-sm leading-relaxed">
+            Blazing fast performance using the Neural Engine. 2-3x faster than generic Whisper.
+          </p>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+            <Icon name="sparkles" size={24} />
+          </div>
+          <h3 class="font-display text-xl font-semibold text-cream">Open Source</h3>
+          <p class="text-text-muted text-sm leading-relaxed">
+            Transparent code, MIT license. No subscriptions, no hidden costs, no lock-in.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Native CoreML Section -->
+  <section class="py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-display font-semibold text-dark mb-6">
+            Native CoreML, not WebAssembly
+          </h2>
+          <p class="text-lg text-text-secondary mb-8 leading-relaxed">
+            Unlike cross-platform apps that run Whisper in WebAssembly, Pindrop runs directly on Apple's Neural Engine using CoreML. This isn't just an implementation detail—it fundamentally changes how transcription performs on your Mac.
+          </p>
+          
+          <div class="space-y-6">
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
+                <Icon name="zap" size={20} />
               </div>
-            </GlassCard>
-          ))}
+              <div>
+                <h4 class="font-semibold text-dark mb-1">Memory-Mapped Models</h4>
+                <p class="text-sm text-text-secondary">Models are memory-mapped, not heap-loaded. The system pages unused portions to disk—no malloc pressure, no GC pauses.</p>
+              </div>
+            </div>
+            
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
+                <Icon name="apple" size={20} />
+              </div>
+              <div>
+                <h4 class="font-semibold text-dark mb-1">Apple Neural Engine</h4>
+                <p class="text-sm text-text-secondary">Transcription runs on dedicated ML accelerators, not general CPU. Better thermal management and battery life.</p>
+              </div>
+            </div>
+            
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
+                <Icon name="shield" size={20} />
+              </div>
+              <div>
+                <h4 class="font-semibold text-dark mb-1">Zero-Copy Audio</h4>
+                <p class="text-sm text-text-secondary">Direct Metal/CoreML calls with no JS→WASM→native translation layers. No transcription warmup lag.</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
-
-      <!-- Comparison Table -->
-      <section id="comparison" class="max-w-5xl mx-auto">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Why Pindrop?</h2>
-          <p class="text-text-secondary">See how we stack up against the alternatives.</p>
+        
+        <div class="bg-dark rounded-2xl p-8 space-y-6">
+          <h4 class="font-display font-semibold text-cream text-lg">Cross-Platform Limitations</h4>
+          <div class="space-y-4 text-sm">
+            <div class="flex justify-between items-start gap-4 pb-4 border-b border-white/10">
+              <span class="text-text-muted">WASM heap constraints</span>
+              <span class="text-cream/60 text-right">Entire model must fit<br/>in sandboxed memory</span>
+            </div>
+            <div class="flex justify-between items-start gap-4 pb-4 border-b border-white/10">
+              <span class="text-text-muted">ML acceleration</span>
+              <span class="text-cream/60 text-right">No direct access to<br/>CoreML or ANE</span>
+            </div>
+            <div class="flex justify-between items-start gap-4 pb-4 border-b border-white/10">
+              <span class="text-text-muted">Audio pipeline</span>
+              <span class="text-cream/60 text-right">Piped through Web Audio<br/>API abstractions</span>
+            </div>
+            <div class="flex justify-between items-start gap-4">
+              <span class="text-text-muted">Warmup time</span>
+              <span class="text-cream/60 text-right">WASM compilation<br/>required on startup</span>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="glass rounded-2xl overflow-hidden border border-white/10">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[600px]">
+  <!-- Features Section -->
+  <section id="features" class="py-32 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-20">
+        <h2 class="text-4xl md:text-5xl font-display font-semibold text-dark mb-6 animate-fade-up">
+          Everything you need for <span class="text-accent">voice productivity</span>
+        </h2>
+        <p class="text-xl text-text-secondary animate-fade-up delay-100">
+          Powerful features designed for power users, wrapped in a beautiful native interface.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        {features.map((feature, i) => (
+          <div class={`group p-8 rounded-2xl bg-surface border border-border hover:border-accent/30 transition-all duration-500 animate-fade-up delay-${(i + 1) * 100}`}>
+            <div class="w-12 h-12 rounded-xl bg-cream border border-border text-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Icon name={feature.icon as any} size={24} />
+            </div>
+            <h3 class="font-display text-2xl font-semibold text-dark mb-3">{feature.title}</h3>
+            <p class="text-text-secondary leading-relaxed">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+      <!-- Comparison Section -->
+      <section id="comparison" class="py-32 px-6 bg-surface">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-display font-semibold text-dark mb-6">
+              Why Pindrop?
+            </h2>
+            <p class="text-xl text-text-secondary">
+              See how we stack up against the alternatives.
+            </p>
+          </div>
+          
+          <div class="bg-cream rounded-2xl border border-border overflow-hidden animate-fade-up">
+            <table class="w-full text-left">
               <thead>
-                <tr class="bg-white/5 border-b border-white/10">
-                  <th class="p-6 text-sm font-medium text-text-muted uppercase tracking-wider w-1/4">Feature</th>
-                  <th class="p-6 text-lg font-bold text-white bg-white/5 border-x border-white/10 w-1/4 text-center">
-                    <span class="gradient-text">Pindrop</span>
-                  </th>
-                  <th class="p-6 text-sm font-medium text-text-secondary w-1/4 text-center">Handy</th>
-                  <th class="p-6 text-sm font-medium text-text-secondary w-1/4 text-center">OpenWhispr</th>
+                <tr class="border-b border-border">
+                  <th class="p-4 text-sm font-medium text-text-muted">Feature</th>
+                  <th class="p-4 text-center font-display font-semibold text-dark bg-accent/10 border-l border-border">Pindrop</th>
+                  <th class="p-4 text-center text-sm font-medium text-text-secondary border-l border-border">Handy</th>
+                  <th class="p-4 text-center text-sm font-medium text-text-secondary border-l border-border">OpenWhispr</th>
+                  <th class="p-4 text-center text-sm font-medium text-text-secondary border-l border-border">SuperWhisper</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-white/5 text-sm md:text-base">
-                {[
-                  ['Platform', 'macOS only (Native)', 'Cross-platform', 'Cross-platform'],
-                  ['Framework', 'Swift/SwiftUI', 'Tauri (Web Wrapper)', 'Tauri (Web Wrapper)'],
-                  ['ML Engine', 'WhisperKit (CoreML)', 'Generic Whisper', 'Generic Whisper'],
-                  ['Apple Silicon', 'Native Optimization', 'Emulated', 'Emulated'],
-                  ['Privacy', '100% Local', 'Local', 'Local'],
-                  ['Cost', 'Free & Open Source', 'Free & Open Source', 'Freemium / Paid'],
-                ].map((row, i) => (
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-6 font-medium text-text-primary">{row[0]}</td>
-                    <td class="p-6 text-center font-bold text-white bg-white/5 border-x border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]">
-                      {row[1]}
+              <tbody>
+                {comparison.map((row, i) => (
+                  <tr class={`border-b border-border ${i === comparison.length - 1 ? 'border-b-0' : ''}`}>
+                    <td class="p-4 text-sm font-medium text-text-secondary">{row.feature}</td>
+                    <td class="p-4 text-center font-medium text-dark bg-accent/5 border-l border-border">
+                      {typeof row.pindrop === 'boolean' ? (
+                        row.pindrop ? <span class="text-accent">&#10003;</span> : <span class="text-text-muted">&#10007;</span>
+                      ) : row.pindrop}
                     </td>
-                    <td class="p-6 text-center text-text-secondary">{row[2]}</td>
-                    <td class="p-6 text-center text-text-secondary">{row[3]}</td>
+                    <td class="p-4 text-center text-sm text-text-secondary border-l border-border">
+                      {typeof row.handy === 'boolean' ? (
+                        row.handy ? <span class="text-accent">&#10003;</span> : <span class="text-text-muted">&#10007;</span>
+                      ) : row.handy}
+                    </td>
+                    <td class="p-4 text-center text-sm text-text-secondary border-l border-border">
+                      {typeof row.openwhispr === 'boolean' ? (
+                        row.openwhispr ? <span class="text-accent">&#10003;</span> : <span class="text-text-muted">&#10007;</span>
+                      ) : row.openwhispr}
+                    </td>
+                    <td class="p-4 text-center text-sm text-text-secondary border-l border-border">
+                      {typeof row.superwhisper === 'boolean' ? (
+                        row.superwhisper ? <span class="text-accent">&#10003;</span> : <span class="text-text-muted">&#10007;</span>
+                      ) : row.superwhisper}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -241,39 +410,23 @@ const softwareSchema = {
         </div>
       </section>
 
-      <!-- Pre-Footer CTA -->
-      <section class="relative py-20 px-6 md:px-20 text-center overflow-hidden rounded-3xl glass border border-white/10 group">
-        <div class="absolute inset-0 bg-gradient-to-r from-brand-orange/20 via-brand-pink/20 to-brand-magenta/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="relative z-10 space-y-8">
-          <h2 class="text-4xl md:text-5xl font-display font-bold text-white">
-            Ready to try <span class="gradient-text">truly private</span> dictation?
-          </h2>
-          <p class="text-xl text-text-secondary max-w-2xl mx-auto">
-            Join thousands of users who have switched to local, fast, and secure voice typing on their Mac.
-          </p>
-          
-          <div class="flex flex-col items-center gap-4">
-            <Button href={downloadUrl} data-download-trigger={downloadUrl} size="lg" icon="download" variant="gradient" class="px-12 py-4 text-xl">
-              Download Pindrop
-            </Button>
-            <p class="text-sm text-text-muted mt-4">
-              Requires macOS 14+ (Sonoma) or later. Apple Silicon (M1/M2/M3) highly recommended.
-            </p>
-          </div>
-        </div>
-      </section>
+  <!-- CTA Section -->
+  <section class="py-32 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl md:text-5xl font-display font-semibold text-dark mb-6 animate-fade-up">
+        Ready for truly private dictation?
+      </h2>
+      <p class="text-xl text-text-secondary mb-12 animate-fade-up delay-100">
+        Join thousands of users who have switched to local, fast, and secure voice typing on their Mac.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 animate-fade-up delay-200">
+        <Button href={downloadUrl} data-download-trigger={downloadUrl} size="lg" variant="primary" icon="download">
+          Download Pindrop
+        </Button>
+      </div>
+    </div>
+  </section>
+</main>
 
-    </main>
-
-    <Footer />
-  </div>
+<Footer />
 </Layout>
-
-<style>
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  .rotate-x-12 {
-    transform: rotateX(12deg);
-  }
-</style>
