@@ -3,111 +3,160 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
-import Button from '../components/Button.astro';
 
 const resources = [
   {
     icon: 'github',
     title: 'GitHub Repository',
-    description: 'Browse source code, star the project, submit PRs',
-    link: 'https://github.com/watzon/pindrop'
+    description: 'Browse the source, open pull requests, and track the roadmap.',
+    link: 'https://github.com/watzon/pindrop',
+    cta: 'View Repository',
   },
   {
     icon: 'sparkles',
-    title: 'Discussions',
-    description: 'Ask questions, share ideas, get community support',
-    link: 'https://github.com/watzon/pindrop/discussions'
+    title: 'GitHub Discussions',
+    description: 'Ask questions, share ideas, and get help from other users.',
+    link: 'https://github.com/watzon/pindrop/discussions',
+    cta: 'Join Discussion',
   },
   {
     icon: 'shield',
-    title: 'Report Issues',
-    description: 'Found a bug? Report it on our issue tracker',
-    link: 'https://github.com/watzon/pindrop/issues'
-  }
+    title: 'Issue Tracker',
+    description: 'Found a bug? Report it so we can fix it in the next release.',
+    link: 'https://github.com/watzon/pindrop/issues',
+    cta: 'Report Issue',
+  },
 ];
 
 const faqItems = [
   {
     question: 'Does Pindrop work on Intel Macs?',
-    answer: 'Yes, Pindrop works on Intel Macs, but it is highly optimized for Apple Silicon (M1/M2/M3) chips using the Neural Engine for best performance and battery life.'
+    answer: 'Yes, Pindrop runs on Intel Macs, but it\'s highly optimized for Apple Silicon (M1 and later) via the Neural Engine. Intel users will see good performance with the smaller models.'
   },
   {
     question: 'Is my data sent anywhere?',
-    answer: 'Transcription is 100% local—your voice never leaves your Mac. Optional AI enhancement can be configured to use external services (OpenAI, OpenRouter) or kept local with Ollama, LM Studio, or other local providers. You control where your data goes.'
+    answer: 'Transcription is 100% local — your voice never leaves your Mac. Optional AI enhancement can be configured to use external services (OpenAI, OpenRouter) or kept local with Ollama or LM Studio. You control where data goes.'
   },
   {
     question: 'What languages are supported?',
-    answer: 'Currently, Pindrop is optimized for English transcription. We are exploring support for additional languages in future updates.'
-  }
+    answer: 'Pindrop currently performs best in English. Whisper models do support many languages, and we\'re working on first-class multi-language support in upcoming releases.'
+  },
+  {
+    question: 'How is this different from macOS Dictation?',
+    answer: 'macOS Dictation sends audio to Apple\'s servers unless you have Enhanced Dictation enabled. Pindrop is always offline-first, supports much larger and more accurate Whisper models, includes transcription history, custom vocabulary, AI enhancement, and is fully open source.'
+  },
+  {
+    question: 'Can I contribute?',
+    answer: 'Absolutely. Pindrop is MIT-licensed and welcomes contributions of all kinds — bug fixes, new features, documentation, and translations. Check out the Contributing Guide on GitHub to get started.'
+  },
 ];
 ---
 
-<Layout title="Community & Support - Pindrop">
+<Layout title="Community & Support — Pindrop">
   <Header />
 
-  <main class="pt-40 pb-20 px-6">
-    <div class="max-w-6xl mx-auto space-y-24">
-      
-      <!-- Hero Section -->
-      <section class="text-center max-w-3xl mx-auto space-y-6">
-        <h1 class="text-4xl md:text-6xl font-display font-semibold tracking-tight text-dark leading-tight">
-          Community & Support
+  <main class="pt-32 pb-24 px-6">
+    <div class="max-w-6xl mx-auto space-y-32">
+
+      <!-- Hero -->
+      <section class="max-w-2xl space-y-5 animate-fade-up">
+        <p class="tag">Community</p>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-text-primary leading-[1.06]">
+          Built together,<br />used by everyone
         </h1>
-        
         <p class="text-xl text-text-secondary leading-relaxed">
-          Get help, report issues, and connect with other users. Pindrop is built by the community, for the community.
+          Pindrop is open source and community-driven. Get help, report issues,
+          and shape what comes next.
         </p>
       </section>
 
-      <!-- Resource Cards -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {resources.map(resource => (
-          <a href={resource.link} target="_blank" rel="noopener noreferrer" class="block h-full">
-            <article class="h-full p-8 rounded-2xl bg-surface border border-border hover:border-accent/30 transition-all duration-500 group">
-              <div class="w-12 h-12 rounded-xl bg-cream border border-border text-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Icon name={resource.icon as any} size={24} />
+      <!-- Resources — horizontal list, no 3-col card grid -->
+      <section>
+        <h2 class="text-xs uppercase tracking-widest font-semibold text-text-muted mb-8 reveal">Get involved</h2>
+        <div class="divide-y divide-border border-t border-b border-border">
+          {resources.map((r, i) => (
+            <a
+              href={r.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={`group flex items-center justify-between gap-6 py-7 hover:bg-surface/40 -mx-6 px-6 transition-colors duration-200 reveal delay-${i + 1}`}
+            >
+              <div class="flex items-start gap-5">
+                <div class="w-10 h-10 shrink-0 rounded-xl bg-surface border border-border text-accent flex items-center justify-center group-hover:bg-accent-subtle group-hover:border-accent/20 transition-colors duration-300">
+                  <Icon name={r.icon as any} size={18} />
+                </div>
+                <div>
+                  <h3 class="font-semibold text-text-primary mb-1 group-hover:text-accent transition-colors duration-200">{r.title}</h3>
+                  <p class="text-sm text-text-secondary">{r.description}</p>
+                </div>
               </div>
-              <h3 class="text-xl font-display font-semibold text-dark mb-2 group-hover:text-accent transition-colors">{resource.title}</h3>
-              <p class="text-sm text-text-secondary leading-relaxed">{resource.description}</p>
-            </article>
-          </a>
-        ))}
+              <div class="flex items-center gap-2 shrink-0 text-sm font-medium text-text-muted group-hover:text-accent transition-colors duration-200">
+                <span class="hidden sm:inline">{r.cta}</span>
+                <Icon name="arrow-right" size={16} />
+              </div>
+            </a>
+          ))}
+        </div>
       </section>
 
-      <!-- Contributing Section -->
-      <section class="rounded-3xl bg-dark p-8 md:p-12">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-          <div class="space-y-4 max-w-2xl text-center md:text-left">
-            <h2 class="text-3xl font-display font-semibold text-cream">Want to contribute?</h2>
-            <p class="text-text-muted text-lg">
-              We welcome contributions of all kinds! Whether it's fixing bugs, improving documentation, or suggesting new features, your help makes Pindrop better.
-            </p>
-            <div class="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
-              <a href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md" target="_blank" class="text-accent hover:text-accent-light transition-colors font-medium underline-offset-4 hover:underline">Read Contributing Guide</a>
-              <span class="text-text-muted">•</span>
-              <a href="https://github.com/watzon/pindrop/blob/main/CODE_OF_CONDUCT.md" target="_blank" class="text-accent hover:text-accent-light transition-colors font-medium underline-offset-4 hover:underline">Code of Conduct</a>
+      <!-- Contributing CTA -->
+      <section class="reveal">
+        <div class="p-0.5 bg-black/4 border border-border rounded-[2rem]">
+          <div class="bg-dark rounded-[calc(2rem-2px)] px-8 md:px-12 py-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div class="space-y-3 max-w-lg text-center md:text-left">
+              <h2 class="text-2xl md:text-3xl font-bold text-dark-text tracking-tight">
+                Want to contribute?
+              </h2>
+              <p class="text-dark-muted leading-relaxed">
+                We welcome bug fixes, new features, documentation, and translations.
+                Read the contributing guide to get oriented quickly.
+              </p>
             </div>
-          </div>
-          <div class="flex-shrink-0">
-            <Button href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md" size="lg" icon="github" variant="primary" external>
-              View Contributing Guide
-            </Button>
+            <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+              <a
+                href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center gap-2 bg-cream text-dark font-semibold px-6 py-3 rounded-full hover:bg-cream-dark transition-all duration-200 active:scale-[0.97] text-sm"
+              >
+                <Icon name="github" size={16} />
+                Contributing Guide
+              </a>
+              <a
+                href="https://github.com/watzon/pindrop/blob/main/CODE_OF_CONDUCT.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center gap-2 border border-white/12 text-dark-text font-medium px-6 py-3 rounded-full hover:bg-white/6 transition-all duration-200 active:scale-[0.97] text-sm"
+              >
+                Code of Conduct
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- FAQ Section -->
-      <section class="max-w-3xl mx-auto w-full space-y-6">
-        <div class="text-center space-y-4">
-          <h2 class="text-3xl font-display font-semibold text-dark">Frequently Asked Questions</h2>
+      <!-- FAQ -->
+      <section class="max-w-3xl">
+        <div class="mb-10 reveal">
+          <p class="tag mb-4">Common questions</p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-text-primary">
+            Frequently asked
+          </h2>
         </div>
-        
-        <div class="space-y-4">
-          {faqItems.map(item => (
-            <div class="p-6 rounded-xl bg-surface border border-border">
-              <h3 class="text-lg font-semibold text-dark mb-2">{item.question}</h3>
-              <p class="text-text-secondary leading-relaxed">{item.answer}</p>
-            </div>
+
+        <div class="space-y-0 divide-y divide-border border-t border-border">
+          {faqItems.map((item, i) => (
+            <details class={`group reveal delay-${i + 1}`}>
+              <summary class="flex items-center justify-between gap-4 py-5 cursor-pointer list-none select-none">
+                <h3 class="font-semibold text-text-primary text-base">{item.question}</h3>
+                <div class="w-7 h-7 shrink-0 rounded-full bg-surface border border-border flex items-center justify-center text-text-muted group-open:rotate-90 transition-transform duration-200">
+                  <Icon name="chevron-right" size={14} />
+                </div>
+              </summary>
+              <div class="pb-6">
+                <p class="text-text-secondary leading-relaxed text-sm">{item.answer}</p>
+              </div>
+            </details>
           ))}
         </div>
       </section>

@@ -3,49 +3,59 @@ import Icon from './Icon.astro';
 
 interface Props {
   href: string;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gradient';
   icon?: string;
+  trailingIcon?: string;
   external?: boolean;
   class?: string;
   size?: 'sm' | 'md' | 'lg';
   'data-download-trigger'?: string;
 }
 
-const { 
-  href, 
-  variant = 'primary', 
-  icon, 
+const {
+  href,
+  variant = 'primary',
+  icon,
+  trailingIcon,
   external = false,
   class: className = '',
   size = 'md',
-  'data-download-trigger': downloadTrigger
+  'data-download-trigger': downloadTrigger,
 } = Astro.props;
 
-const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-cream";
+const base = "inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-cream active:scale-[0.97] select-none";
 
-const variantStyles = {
-  primary: "bg-dark text-cream hover:bg-dark-surface shadow-sm hover:shadow-md",
-  secondary: "bg-surface text-text-primary border border-border hover:bg-border hover:border-text-muted",
-  ghost: "text-text-secondary hover:text-text-primary hover:bg-surface"
+const variants = {
+  primary:   "bg-dark text-dark-text shadow-sm hover:bg-dark-surface hover:shadow-md",
+  secondary: "bg-cream border border-border text-text-primary shadow-xs hover:bg-cream-dark hover:border-border-strong hover:shadow-sm",
+  ghost:     "text-text-secondary hover:text-text-primary hover:bg-surface",
+  gradient:  "bg-gradient-to-r from-brand-orange to-brand-pink text-white shadow-sm hover:opacity-90 hover:shadow-md",
 };
 
-const sizeStyles = {
-  sm: "text-sm px-4 py-2 gap-2",
-  md: "text-base px-5 py-2.5 gap-2",
-  lg: "text-lg px-7 py-3.5 gap-2.5"
+const sizes = {
+  sm: "text-xs px-4 py-2 gap-1.5",
+  md: "text-sm px-5 py-2.5 gap-2",
+  lg: "text-base px-7 py-3.5 gap-2.5",
 };
 
-const combinedClass = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
+const iconSize = { sm: 14, md: 16, lg: 18 }[size];
+
+const combinedClass = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
 ---
 
-<a 
-  href={href} 
+<a
+  href={href}
   class={combinedClass}
-  target={external ? "_blank" : undefined}
-  rel={external ? "noopener noreferrer" : undefined}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
   data-download-trigger={downloadTrigger}
   onclick={downloadTrigger ? `event.preventDefault(); window.openDownloadModal('${downloadTrigger}')` : undefined}
 >
-  {icon && <Icon name={icon as any} size={size === 'sm' ? 16 : size === 'md' ? 18 : 22} />}
+  {icon && <Icon name={icon as any} size={iconSize} />}
   <slot />
+  {trailingIcon && (
+    <span class="w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center -mr-1.5 group-hover:translate-x-0.5 transition-transform duration-200">
+      <Icon name={trailingIcon as any} size={12} />
+    </span>
+  )}
 </a>

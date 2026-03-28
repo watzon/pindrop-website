@@ -2,7 +2,7 @@
 import Layout from './Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import screenshot from '../assets/images/screenshot.png';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   title: string;
@@ -40,53 +40,65 @@ const articleSchema = {
       "url": new URL('/favicon.svg', Astro.site).toString()
     }
   },
-  "image": new URL(screenshot.src, Astro.site).toString(),
   "keywords": tags?.join(", ") || "Pindrop, dictation, AI, macOS"
 };
 ---
 
-<Layout title={`${title} - Pindrop Blog`} description={description} type="article" image={screenshot.src}>
+<Layout title={`${title} — Pindrop Blog`} description={description} type="article">
 <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
 
 <Header />
 
-<main class="pt-40 pb-20 px-6">
+<main class="pt-32 pb-24 px-6">
   <div class="max-w-3xl mx-auto">
-    <a 
-      href="/blog" 
-      class="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors mb-12 group"
+
+    <!-- Back link -->
+    <a
+      href="/blog"
+      class="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors duration-200 mb-14 group"
     >
-      <div class="p-1.5 rounded-lg bg-surface border border-border group-hover:border-accent/30 transition-colors group-hover:-translate-x-1 duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
+      <div class="w-7 h-7 rounded-full bg-surface border border-border flex items-center justify-center group-hover:border-border-strong group-hover:-translate-x-0.5 transition-all duration-200">
+        <Icon name="chevron-right" size={13} class="rotate-180" />
       </div>
       Back to Blog
     </a>
 
     <article>
-      <header class="text-center mb-16 space-y-6">
-        <div class="flex items-center justify-center gap-4 text-sm text-text-muted">
-          <time datetime={date.toISOString()}>{formattedDate}</time>
+
+      <!-- Article header -->
+      <header class="mb-16 space-y-6">
+        <div class="flex flex-wrap items-center gap-3">
+          <time datetime={date.toISOString()} class="text-sm font-mono text-text-muted">
+            {formattedDate}
+          </time>
           {version && (
-            <span class="px-3 py-1 rounded-full bg-accent/10 text-accent border border-accent/20 text-xs font-mono font-medium">
+            <span class="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-accent-subtle text-accent border border-accent/20">
               v{version}
             </span>
           )}
+          {tags?.map(tag => (
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-surface border border-border text-text-muted">
+              {tag}
+            </span>
+          ))}
         </div>
-        
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-dark leading-[1.1] tracking-tight">
+
+        <h1 class="text-4xl md:text-5xl lg:text-[3.25rem] font-bold tracking-tight text-text-primary leading-[1.07]">
           {title}
         </h1>
-        
-        <p class="text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+
+        <p class="text-lg md:text-xl text-text-secondary leading-relaxed">
           {description}
         </p>
+
+        <div class="divider"></div>
       </header>
-      
+
+      <!-- Post body -->
       <div class="blog-content">
         <slot />
       </div>
+
     </article>
   </div>
 </main>
@@ -96,17 +108,21 @@ const articleSchema = {
 
 <style>
   @reference "../styles/global.css";
-  
+
   .blog-content {
-    @apply text-lg text-text-secondary leading-relaxed;
+    @apply text-base md:text-lg text-text-secondary leading-relaxed;
   }
 
   .blog-content :global(h2) {
-    @apply text-2xl md:text-3xl font-display font-semibold text-dark mt-16 mb-6 scroll-mt-32;
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-text-primary mt-16 mb-5 scroll-mt-32;
   }
 
   .blog-content :global(h3) {
-    @apply text-xl md:text-2xl font-display font-semibold text-dark mt-10 mb-4 scroll-mt-32;
+    @apply text-xl md:text-2xl font-bold tracking-tight text-text-primary mt-10 mb-4 scroll-mt-32;
+  }
+
+  .blog-content :global(h4) {
+    @apply text-lg font-semibold text-text-primary mt-8 mb-3 scroll-mt-32;
   }
 
   .blog-content :global(p) {
@@ -122,7 +138,7 @@ const articleSchema = {
   }
 
   .blog-content :global(li) {
-    @apply pl-2 marker:text-accent;
+    @apply pl-2;
   }
 
   .blog-content :global(a) {
@@ -130,30 +146,46 @@ const articleSchema = {
   }
 
   .blog-content :global(strong) {
-    @apply text-dark font-semibold;
+    @apply text-text-primary font-semibold;
+  }
+
+  .blog-content :global(em) {
+    @apply italic;
   }
 
   .blog-content :global(blockquote) {
-    @apply border-l-4 border-accent/50 pl-6 py-1 my-8 italic text-text-muted bg-surface rounded-r-lg;
+    @apply border-l-2 border-accent/40 pl-6 my-8 text-text-muted italic;
   }
 
   .blog-content :global(code) {
-    @apply font-mono text-sm bg-surface text-accent px-1.5 py-0.5 rounded border border-border;
+    @apply font-mono text-sm bg-surface text-accent px-1.5 py-0.5 rounded-md border border-border;
   }
 
   .blog-content :global(pre) {
-    @apply bg-dark p-6 rounded-xl border border-border/50 overflow-x-auto mb-8 text-sm leading-relaxed;
+    @apply bg-dark rounded-2xl p-6 border border-dark-border overflow-x-auto mb-8 text-sm leading-relaxed;
   }
 
   .blog-content :global(pre code) {
-    @apply bg-transparent p-0 text-cream border-none text-sm;
+    @apply bg-transparent p-0 text-dark-text border-none text-sm;
   }
 
   .blog-content :global(img) {
-    @apply rounded-xl border border-border shadow-md my-8 w-full h-auto;
+    @apply rounded-2xl border border-border shadow-md my-8 w-full h-auto;
   }
 
   .blog-content :global(hr) {
     @apply border-border my-12;
+  }
+
+  .blog-content :global(table) {
+    @apply w-full text-sm border-collapse mb-8;
+  }
+
+  .blog-content :global(th) {
+    @apply text-left font-semibold text-text-primary p-3 border-b border-border bg-surface;
+  }
+
+  .blog-content :global(td) {
+    @apply p-3 border-b border-border text-text-secondary;
   }
 </style>

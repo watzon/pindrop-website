@@ -3,61 +3,87 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection } from 'astro:content';
+import Icon from '../../components/Icon.astro';
 
 const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
-const title = "Blog & Changelog";
-const description = "Release notes, updates, and announcements for Pindrop.";
+const title = 'Blog & Changelog';
+const description = 'Release notes, updates, and announcements for Pindrop.';
 ---
 
-<Layout title={title} description={description}>
-   <Header />
+<Layout title={`${title} — Pindrop`} description={description}>
+  <Header />
 
-   <main class="pt-40 pb-20 px-6">
+  <main class="pt-32 pb-24 px-6">
     <div class="max-w-6xl mx-auto">
-      <header class="text-center mb-20 space-y-6">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-dark leading-[1.1] tracking-tight">
-          Blog & Changelog
+
+      <!-- Header -->
+      <header class="max-w-xl mb-20 animate-fade-up space-y-4">
+        <p class="tag">Updates</p>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-text-primary leading-[1.06]">
+          Blog &amp; Changelog
         </h1>
-        <p class="text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Release notes, updates, and announcements.
+        <p class="text-text-secondary leading-relaxed">
+          Release notes, feature announcements, and development updates.
         </p>
       </header>
 
-      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
-          <a href={`/blog/${post.id}`} class="group block">
-            <article class="h-full p-8 rounded-2xl bg-surface border border-border hover:border-accent/30 transition-all duration-500">
-              <div class="flex items-center justify-between mb-4">
-                <time datetime={post.data.date.toISOString()} class="text-sm text-text-muted font-mono">
-                  {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </time>
-                {post.data.version && (
-                  <span class="px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 text-xs font-mono font-medium">
-                    v{post.data.version}
-                  </span>
-                )}
-              </div>
-              
-              <h2 class="text-2xl font-display font-semibold text-dark mb-3 group-hover:text-accent transition-colors leading-tight">
-                {post.data.title}
-              </h2>
-              
-              <p class="text-text-secondary mb-6 line-clamp-3 leading-relaxed">
-                {post.data.description}
-              </p>
-              
-              <div class="flex items-center text-sm font-medium text-accent mt-auto group-hover:translate-x-1 transition-transform duration-300">
-                Read more <span class="ml-1">&rarr;</span>
-              </div>
-            </article>
-          </a>
-        ))}
-      </div>
+      <!-- Posts: 2-col max, editorial feel -->
+      {posts.length === 0 ? (
+        <p class="text-text-muted">No posts yet.</p>
+      ) : (
+        <div class="grid md:grid-cols-2 gap-6">
+          {posts.map((post, i) => (
+            <a
+              href={`/blog/${post.id}`}
+              class={`group block reveal delay-${Math.min(i + 1, 4)}`}
+            >
+              <article class="h-full p-0.5 bg-surface border border-border rounded-[2rem] hover:border-accent/25 transition-colors duration-500">
+                <div class="h-full bg-cream rounded-[calc(2rem-2px)] p-8 md:p-10 flex flex-col gap-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+
+                  <!-- Meta -->
+                  <div class="flex items-center justify-between gap-3">
+                    <time
+                      datetime={post.data.date.toISOString()}
+                      class="text-xs font-mono text-text-muted tracking-wider"
+                    >
+                      {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </time>
+                    {post.data.version && (
+                      <span class="text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-full bg-accent-subtle text-accent border border-accent/20">
+                        v{post.data.version}
+                      </span>
+                    )}
+                  </div>
+
+                  <!-- Title & excerpt -->
+                  <div class="flex-1 space-y-3">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-tight text-text-primary leading-snug group-hover:text-accent transition-colors duration-200">
+                      {post.data.title}
+                    </h2>
+                    <p class="text-sm text-text-secondary line-clamp-3 leading-relaxed">
+                      {post.data.description}
+                    </p>
+                  </div>
+
+                  <!-- CTA -->
+                  <div class="flex items-center gap-1.5 text-sm font-medium text-accent group-hover:gap-2.5 transition-all duration-200">
+                    Read more
+                    <Icon name="arrow-right" size={14} />
+                  </div>
+
+                </div>
+              </article>
+            </a>
+          ))}
+        </div>
+      )}
+
     </div>
   </main>
 
   <Footer />
 </Layout>
+

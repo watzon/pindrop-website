@@ -1,5 +1,4 @@
 ---
-import Button from './Button.astro';
 import Icon from './Icon.astro';
 import pindropLogo from '../assets/pindrop-logo.svg';
 
@@ -19,41 +18,165 @@ try {
       downloadUrl = dmgAsset.browser_download_url;
     }
   }
-} catch (e) {
-}
+} catch (e) {}
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-cream/80 backdrop-blur-md border-b border-border/50">
-  <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-3 group">
-      <img src={pindropLogo.src} alt="" width="24" height="24" class="transition-transform duration-300 group-hover:scale-110" />
-      <span class="font-display font-semibold text-xl tracking-tight">Pindrop</span>
+<!-- Floating pill nav wrapper -->
+<div class="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-5 pointer-events-none">
+
+  <!-- Desktop pill -->
+  <nav class="hidden md:flex pointer-events-auto items-center gap-0.5 bg-white/75 backdrop-blur-xl border border-black/6 rounded-full px-2 py-1.5 shadow-[0_2px_24px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]">
+    <a href="/" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 transition-colors duration-200 group">
+      <img src={pindropLogo.src} alt="" width="18" height="18" class="transition-transform duration-300 group-hover:scale-110" />
+      <span class="font-semibold text-sm tracking-tight text-text-primary">Pindrop</span>
     </a>
 
-    <div class="hidden md:flex items-center gap-8">
-      {navItems.map(item => (
-        <a 
-          href={item.href} 
-          class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+    <div class="w-px h-4 bg-black/10 mx-1.5"></div>
+
+    {navItems.map(item => (
+      <a
+        href={item.href}
+        class="px-3.5 py-1.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-black/4 rounded-full transition-all duration-200"
+      >
+        {item.label}
+      </a>
+    ))}
+
+    <div class="w-px h-4 bg-black/10 mx-1.5"></div>
+
+    <a
+      href="https://github.com/watzon/pindrop"
+      class="p-2 text-text-secondary hover:text-text-primary hover:bg-black/4 rounded-full transition-all duration-200"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View on GitHub"
+    >
+      <Icon name="github" size={16} />
+    </a>
+
+    <a
+      href={downloadUrl}
+      data-download-trigger={downloadUrl}
+      onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
+      class="ml-1 bg-dark text-dark-text text-sm font-medium px-4 py-2 rounded-full hover:bg-dark-surface transition-all duration-200 active:scale-[0.97] shadow-sm"
+    >
+      Download
+    </a>
+  </nav>
+
+  <!-- Mobile pill -->
+  <div class="flex md:hidden pointer-events-auto items-center justify-between w-full max-w-lg bg-white/80 backdrop-blur-xl border border-black/6 rounded-full px-4 py-2.5 shadow-[0_2px_24px_rgba(0,0,0,0.06)]">
+    <a href="/" class="flex items-center gap-2">
+      <img src={pindropLogo.src} alt="" width="18" height="18" />
+      <span class="font-semibold text-sm tracking-tight text-text-primary">Pindrop</span>
+    </a>
+    <button
+      id="mobile-menu-btn"
+      class="w-8 h-8 flex flex-col items-center justify-center gap-1.5 rounded-full hover:bg-black/5 transition-colors"
+      aria-label="Open menu"
+    >
+      <span class="hamburger-top block w-4.5 h-[1.5px] bg-text-primary rounded-full transition-all duration-300 origin-center"></span>
+      <span class="hamburger-bot block w-4.5 h-[1.5px] bg-text-primary rounded-full transition-all duration-300 origin-center"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Mobile overlay -->
+<div
+  id="mobile-overlay"
+  class="fixed inset-0 z-200 hidden opacity-0 bg-cream/96 backdrop-blur-2xl transition-opacity duration-300"
+>
+  <div class="flex flex-col h-full px-6 pt-24 pb-10">
+    <button
+      id="mobile-close"
+      class="absolute top-5 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-surface border border-border hover:bg-surface-2 transition-colors"
+      aria-label="Close menu"
+    >
+      <Icon name="x" size={16} />
+    </button>
+
+    <nav class="flex flex-col gap-1 mb-8">
+      {navItems.map((item, i) => (
+        <a
+          href={item.href}
+          class={`mobile-nav-link px-4 py-3.5 text-2xl font-semibold text-text-primary hover:text-accent transition-colors duration-200 border-b border-border opacity-0 translate-y-4`}
+          style={`transition-delay: ${i * 60 + 100}ms`}
         >
           {item.label}
         </a>
       ))}
-      <a 
-        href="https://github.com/watzon/pindrop" 
-        class="text-text-secondary hover:text-text-primary transition-colors"
+    </nav>
+
+    <div class="mt-auto flex flex-col gap-3 mobile-nav-link opacity-0 translate-y-4" style="transition-delay: 280ms">
+      <a
+        href={downloadUrl}
+        data-download-trigger={downloadUrl}
+        onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
+        class="w-full text-center bg-dark text-dark-text font-semibold py-3.5 rounded-full hover:bg-dark-surface transition-colors active:scale-[0.98]"
+      >
+        Download for macOS
+      </a>
+      <a
+        href="https://github.com/watzon/pindrop"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="GitHub"
+        class="w-full text-center bg-surface border border-border text-text-secondary font-medium py-3.5 rounded-full hover:bg-surface-2 transition-colors flex items-center justify-center gap-2"
       >
-        <Icon name="github" size={20} />
+        <Icon name="github" size={18} />
+        GitHub
       </a>
     </div>
+  </div>
+</div>
 
-    <div class="flex items-center gap-4">
-      <Button href={downloadUrl} data-download-trigger={downloadUrl} size="sm" variant="primary">
-        Download
-      </Button>
-    </div>
-  </nav>
-</header>
+<script>
+  function setupMobileMenu() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const overlay = document.getElementById('mobile-overlay');
+    const closeBtn = document.getElementById('mobile-close');
+    const links = document.querySelectorAll('.mobile-nav-link');
+
+    if (!btn || !overlay || !closeBtn) return;
+
+    function openMenu() {
+      if (!overlay) return;
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => {
+        if (!overlay) return;
+        overlay.classList.remove('opacity-0');
+        links.forEach(link => {
+          link.classList.remove('opacity-0', 'translate-y-4');
+        });
+      });
+    }
+
+    function closeMenu() {
+      if (!overlay) return;
+      overlay.classList.add('opacity-0');
+      links.forEach(link => {
+        link.classList.add('opacity-0', 'translate-y-4');
+      });
+      setTimeout(() => {
+        if (!overlay) return;
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    btn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // Close on nav link click
+    overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  }
+
+  document.addEventListener('astro:page-load', setupMobileMenu);
+  setupMobileMenu();
+</script>

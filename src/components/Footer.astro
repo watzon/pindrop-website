@@ -3,42 +3,94 @@ import Icon from './Icon.astro';
 import pindropLogo from '../assets/pindrop-logo.svg';
 
 const currentYear = new Date().getFullYear();
+
+const links = [
+  {
+    label: 'Product',
+    items: [
+      { label: 'Features', href: '/#features' },
+      { label: 'Download', href: '/#download' },
+      { label: 'Changelog', href: '/blog' },
+    ]
+  },
+  {
+    label: 'Community',
+    items: [
+      { label: 'GitHub', href: 'https://github.com/watzon/pindrop', external: true },
+      { label: 'Discussions', href: 'https://github.com/watzon/pindrop/discussions', external: true },
+      { label: 'Report a Bug', href: 'https://github.com/watzon/pindrop/issues', external: true },
+    ]
+  },
+  {
+    label: 'Legal',
+    items: [
+      { label: 'MIT License', href: 'https://github.com/watzon/pindrop/blob/main/LICENSE', external: true },
+      { label: 'Contributing', href: 'https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md', external: true },
+    ]
+  }
+];
 ---
 
-<footer class="py-16 px-6 border-t border-border bg-cream">
+<footer class="border-t border-border bg-cream-dark pt-16 pb-10 px-6">
   <div class="max-w-6xl mx-auto">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-      <div class="flex flex-col items-center md:items-start gap-4">
-        <a href="/" class="flex items-center gap-2">
-          <img src={pindropLogo.src} alt="" width="20" height="20" />
-          <span class="font-display font-semibold text-lg">Pindrop</span>
+
+    <!-- Top row: brand + links -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+
+      <!-- Brand col -->
+      <div class="md:col-span-1 space-y-5">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <img src={pindropLogo.src} alt="" width="22" height="22" class="transition-transform duration-300 group-hover:scale-110" />
+          <span class="font-semibold text-lg tracking-tight">Pindrop</span>
         </a>
-        <p class="text-sm text-text-muted">
-          &copy; {currentYear} Pindrop. Open source under MIT License.
+        <p class="text-sm text-text-muted leading-relaxed max-w-[220px]">
+          Voice typing that stays on your Mac. No cloud. No subscriptions.
         </p>
+        <div class="flex items-center gap-3">
+          <a
+            href="https://github.com/watzon/pindrop"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-2 rounded-full bg-surface border border-border text-text-muted hover:text-text-primary hover:border-border-strong transition-all duration-200"
+            aria-label="GitHub"
+          >
+            <Icon name="github" size={16} />
+          </a>
+        </div>
       </div>
 
-      <div class="flex items-center gap-6">
-        <a href="/blog" class="text-sm text-text-secondary hover:text-text-primary transition-colors">
-          Blog
-        </a>
-        <a href="https://github.com/watzon/pindrop" class="text-text-secondary hover:text-text-primary transition-colors" aria-label="GitHub">
-          <Icon name="github" size={20} />
-        </a>
-        <a href="https://github.com/watzon/pindrop/discussions" class="text-sm text-text-secondary hover:text-text-primary transition-colors">
-          Discussions
-        </a>
-        <a href="https://github.com/watzon/pindrop/blob/main/LICENSE" class="text-sm text-text-secondary hover:text-text-primary transition-colors">
-          License
-        </a>
-      </div>
-
-      <div class="text-sm text-text-muted flex items-center gap-2">
-        <span>Built with</span>
-        <span class="text-text-secondary">WhisperKit</span>
-        <span>&amp;</span>
-        <span class="text-text-secondary">SwiftUI</span>
-      </div>
+      <!-- Link groups -->
+      {links.map(group => (
+        <div class="space-y-4">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-text-muted">{group.label}</h4>
+          <ul class="space-y-3">
+            {group.items.map(item => (
+              <li>
+                <a
+                  href={item.href}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  class="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
+
+    <!-- Bottom bar -->
+    <div class="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
+      <span>&copy; {currentYear} Pindrop. Open source under MIT License.</span>
+      <span class="flex items-center gap-1.5">
+        Built with
+        <span class="text-text-secondary font-medium">WhisperKit</span>
+        &amp;
+        <span class="text-text-secondary font-medium">SwiftUI</span>
+      </span>
+    </div>
+
   </div>
 </footer>
