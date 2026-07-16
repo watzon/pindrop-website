@@ -38,6 +38,15 @@ import Orb from './Orb.astro';
     { t: 'types.', accent: true },
   ];
 
+  // Signed 52 ms RMS buckets from all 3:33 of Never Gonna Give You Up.
+  // The canvas plays a four-second window across them in real time.
+  const NEVER_GONNA_GIVE_YOU_UP = Uint8Array.from(
+    atob('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/BncP83MKvEWCv/TNsPn9OQW6+z66ebPN9IzPlog/9Q0yD7iMdwi4foS5u4e5/PkxzP/8SVFwAzuHyscDvQd5R/l2803uPH5Ldom0tjM1cvk/h3c1CAe4evYF//k0tsi4SckINn54SPXLNfbzsc9/NlQYl3WJdHEQfP33iDX6tzPzsT3+xTbHu8h29bPJgbQyz8t1cYszuf/ziLcwds458nQ+xQX0cbVy9305f7s1NYb6+Hm7dnrEM7TRskv0kY68RQ0N6/OLcfMNxjz2stRujfULSfj7TPCRzzY0co2NBzOPkpAQVRWWUnnyEy3VriwSqpg0sm2R1FAsa60XynMrlSltFBQrVe5OaibaKSqqKFqRzyUgIBwX4urYFY6UqOlq6ZxiI+uP1thXp2gZ42UiE+Wd4B4Z42TfIBIoo6VeG1yj2R6oFNmb4B4enVja19ZgoCAcZeMcY1tZY6LgICAgICAdGSAgICAgoCAgYVueYCFgICDgICAcICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=='),
+    value => value.charCodeAt(0),
+  );
+  const SONG_DURATION = 213.043;
+  const WAVE_WINDOW = 4;
+
   class HeroDictation extends HTMLElement {
     private committedEl!: HTMLElement;
     private tentativeEl!: HTMLElement;
@@ -54,7 +63,7 @@ import Orb from './Orb.astro';
 
     private waveRaf = 0;
     private waveT = 0;
-    /** 1 while "speaking" (typing), eases toward 0.3 once inserted. */
+    /** 1 while "speaking" (typing), eases toward 0.6 once inserted. */
     private energy = 1;
     private energyTarget = 1;
 
@@ -75,7 +84,7 @@ import Orb from './Orb.astro';
       window.addEventListener('resize', () => this.sizeWave());
 
       if (reduced) {
-        this.drawWave(0, 0.35);
+        this.drawWave(0, 0.6);
         this.setState('inserted');
         return;
       }
@@ -130,7 +139,7 @@ import Orb from './Orb.astro';
         } else {
           clearInterval(this.timerInterval);
           this.setState('inserted');
-          this.energyTarget = 0.3;
+          this.energyTarget = 0.6;
         }
       };
       this.typingTimeout = window.setTimeout(step, 500);
@@ -175,16 +184,26 @@ import Orb from './Orb.astro';
       const steps = Math.max(48, Math.floor(w / 6));
       for (let s = 0; s <= steps; s++) {
         const x01 = s / steps;
-        const speech =
-          Math.sin(x01 * 9 + t * 1.6) * 2.6 +
-          Math.sin(x01 * 23 - t * 1.1) * 1.4 +
-          Math.sin(x01 * 41 + t * 2.3) * 0.8;
-        const y = mid + speech * energy;
+        const firstSample = (t / SONG_DURATION) * NEVER_GONNA_GIVE_YOU_UP.length;
+        const windowSamples = (WAVE_WINDOW / SONG_DURATION) * NEVER_GONNA_GIVE_YOU_UP.length;
+        const samplePosition = (firstSample + x01 * windowSamples) % NEVER_GONNA_GIVE_YOU_UP.length;
+        const left = Math.floor(samplePosition);
+        const mix = samplePosition - left;
+        const leftSample = NEVER_GONNA_GIVE_YOU_UP[left] / 127.5 - 1;
+        const rightSample =
+          NEVER_GONNA_GIVE_YOU_UP[(left + 1) % NEVER_GONNA_GIVE_YOU_UP.length] / 127.5 - 1;
+        const songSample = leftSample + (rightSample - leftSample) * mix;
+        const y = mid + songSample * h * 0.38 * energy;
         const x = x01 * w;
         if (s === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
-      ctx.strokeStyle = 'rgba(242, 181, 74, 0.5)';
+      const stroke = ctx.createLinearGradient(0, 0, w, 0);
+      stroke.addColorStop(0, 'rgba(242, 181, 74, 0)');
+      stroke.addColorStop(0.06, 'rgba(242, 181, 74, 0.5)');
+      stroke.addColorStop(0.94, 'rgba(242, 181, 74, 0.5)');
+      stroke.addColorStop(1, 'rgba(242, 181, 74, 0)');
+      ctx.strokeStyle = stroke;
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
