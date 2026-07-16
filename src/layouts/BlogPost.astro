@@ -13,10 +13,11 @@ interface Props {
   tags?: string[];
 }
 
-const { id, title, description, date, version } = Astro.props;
+const { id, title, description, date, version, tags = [] } = Astro.props;
 
-// Derive OG image URL from post id if available, otherwise fall back to home OG
 const ogImage = id ? `/og/blog/${id}.png` : undefined;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageUrl = new URL(ogImage ?? '/og/home.png', Astro.site).toString();
 
 const formattedDate = date.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -32,6 +33,19 @@ const articleSchema = {
   "description": description,
   "datePublished": date.toISOString(),
   "dateModified": date.toISOString(),
+  "url": canonicalURL,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": ogImageUrl,
+    "width": 1200,
+    "height": 630
+  },
+  "inLanguage": "en-US",
+  ...(tags.length > 0 && { "keywords": tags.join(', ') }),
   "author": {
     "@type": "Organization",
     "name": "Pindrop",
@@ -48,7 +62,15 @@ const articleSchema = {
 };
 ---
 
-<Layout title={`${title} — Pindrop Blog`} description={description} type="article" image={ogImage}>
+<Layout
+  title={`${title} — Pindrop Blog`}
+  description={description}
+  type="article"
+  image={ogImage}
+  imageAlt={`Pindrop Blog: ${title}`}
+  publishedTime={date}
+  tags={tags}
+>
 <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
 
 <Header />

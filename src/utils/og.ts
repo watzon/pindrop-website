@@ -1,4 +1,4 @@
-import satori from 'satori';
+import satori, { type SatoriOptions } from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -32,16 +32,16 @@ function loadFonts() {
   return _fonts;
 }
 
-function satoriOptions() {
+function satoriOptions(): SatoriOptions {
   const { regular, bold, italic, mono } = loadFonts();
   return {
     width: 1200,
     height: 630,
     fonts: [
-      { name: 'Sentient', data: regular.buffer, weight: 400 as const, style: 'normal' as const },
-      { name: 'Sentient', data: bold.buffer,    weight: 700 as const, style: 'normal' as const },
-      { name: 'Sentient', data: italic.buffer,  weight: 400 as const, style: 'italic' as const },
-      { name: 'Mono',     data: mono.buffer,    weight: 400 as const, style: 'normal' as const },
+      { name: 'Sentient', data: regular, weight: 400, style: 'normal' },
+      { name: 'Sentient', data: bold,    weight: 700, style: 'normal' },
+      { name: 'Sentient', data: italic,  weight: 400, style: 'italic' },
+      { name: 'Mono',     data: mono,    weight: 400, style: 'normal' },
     ],
   };
 }
@@ -55,18 +55,34 @@ function trunc(s: string, n: number) {
 // IMPORTANT: never pass `children: []` — an empty array is truthy, which triggers satori's
 // "must have display: flex" guard even when there are zero children.
 type StyleObj = Record<string, string | number>;
-function el(tag: string, style: StyleObj, ...children: any[]) {
-  const c = children.length === 0
-    ? undefined
-    : children.length === 1
-    ? children[0]
-    : children;
-  return { type: tag, props: c !== undefined ? { style, children: c } : { style } };
+type SatoriElement = Parameters<typeof satori>[0];
+interface SectionOGOptions {
+  label: string;
+  title: string;
+  accent: string;
+  description: string;
+  path: string;
 }
-function flex(style: StyleObj, ...children: any[]) {
+
+function el(tag: string, style: StyleObj, ...children: SatoriElement[]): SatoriElement {
+  let child: SatoriElement | SatoriElement[] | undefined;
+  if (children.length === 1) {
+    child = children[0];
+  } else if (children.length > 1) {
+    child = children;
+  }
+
+  const node = {
+    type: tag,
+    props: child !== undefined ? { style, children: child } : { style }
+  };
+  // Satori consumes React-compatible object nodes without requiring React at runtime.
+  return node as unknown as SatoriElement;
+}
+function flex(style: StyleObj, ...children: SatoriElement[]) {
   return el('div', { display: 'flex', ...style }, ...children);
 }
-function col(style: StyleObj, ...children: any[]) {
+function col(style: StyleObj, ...children: SatoriElement[]) {
   return flex({ flexDirection: 'column', ...style }, ...children);
 }
 function text(content: string, style: StyleObj) {
@@ -98,7 +114,7 @@ function orb(size: number, x: number, y: number) {
   );
 }
 
-function pageBase(...children: any[]) {
+function pageBase(...children: SatoriElement[]) {
   return col({
     width: 1200,
     height: 630,
@@ -154,6 +170,57 @@ function homeElement() {
   );
 }
 
+// ─── Section OG ───────────────────────────────────────────────
+
+function sectionElement(opts: SectionOGOptions) {
+  const { label, title, accent, description, path } = opts;
+
+  return pageBase(
+    orb(160, 995, 315),
+
+    col({ flex: 1 },
+      flex({ alignItems: 'center', gap: 18 },
+        text('Pindrop', { fontSize: 26, color: C.ink, fontWeight: 700 }),
+        text(label.toUpperCase(), {
+          fontFamily: 'Mono',
+          fontSize: 16,
+          color: C.emberBright,
+          letterSpacing: '0.08em',
+        })
+      ),
+
+      col({ flex: 1, justifyContent: 'center', maxWidth: 800 },
+        text(title, {
+          fontSize: 72,
+          fontWeight: 700,
+          color: C.ink,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.05,
+        }),
+        text(accent, {
+          fontSize: 72,
+          fontStyle: 'italic',
+          color: C.emberBright,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.05,
+          marginBottom: 24,
+        }),
+        text(description, {
+          fontSize: 24,
+          color: C.ink2,
+          lineHeight: 1.4,
+          maxWidth: 720,
+        })
+      ),
+
+      flex({ alignItems: 'center', justifyContent: 'space-between' },
+        text(`pindrop.dev${path}`, { fontFamily: 'Mono', fontSize: 18, color: C.ink3 }),
+        text('macOS 14+ · on-device · MIT', { fontFamily: 'Mono', fontSize: 18, color: C.ink3 })
+      )
+    )
+  );
+}
+
 // ─── Blog post OG ─────────────────────────────────────────────
 
 function blogPostElement(opts: {
@@ -164,7 +231,10 @@ function blogPostElement(opts: {
 }) {
   const { title, description, date, version } = opts;
   const dateStr = date.toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric'
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
   });
 
   return pageBase(
@@ -207,15 +277,20 @@ function blogPostElement(opts: {
 }
 
 // ─── SVG → PNG ───────────────────────────────────────────────
-function svgToPng(svg: string): Uint8Array {
+function svgToPng(svg: string): ArrayBuffer {
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
-  return resvg.render().asPng();
+  return Uint8Array.from(resvg.render().asPng()).buffer;
 }
 
 // ─── Public API ───────────────────────────────────────────────
 
-export async function generateHomeOG(): Promise<Uint8Array> {
-  const svg = await satori(homeElement() as any, satoriOptions());
+export async function generateHomeOG(): Promise<ArrayBuffer> {
+  const svg = await satori(homeElement(), satoriOptions());
+  return svgToPng(svg);
+}
+
+export async function generateSectionOG(opts: SectionOGOptions): Promise<ArrayBuffer> {
+  const svg = await satori(sectionElement(opts), satoriOptions());
   return svgToPng(svg);
 }
 
@@ -224,7 +299,7 @@ export async function generateBlogPostOG(opts: {
   description: string;
   date: Date;
   version?: string;
-}): Promise<Uint8Array> {
-  const svg = await satori(blogPostElement(opts) as any, satoriOptions());
+}): Promise<ArrayBuffer> {
+  const svg = await satori(blogPostElement(opts), satoriOptions());
   return svgToPng(svg);
 }

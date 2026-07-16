@@ -44,9 +44,28 @@ const faqItems = [
     answer: 'Absolutely. Pindrop is MIT-licensed and welcomes bug fixes, features, documentation, and translations. Several recent releases shipped contributor work, from Bluetooth mic fixes to whole new dictation languages.'
   },
 ];
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map(({ question, answer }) => ({
+    "@type": "Question",
+    "name": question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": answer
+    }
+  }))
+};
+
 ---
 
-<Layout title="Community & Support — Pindrop" description="Where Pindrop gets built: GitHub, Discussions, and the people dictating in thirty languages.">
+<Layout
+  title="Community & Support — Pindrop"
+  description="Where Pindrop gets built: GitHub, Discussions, and the people dictating in thirty languages."
+  image="/og/community.png"
+  imageAlt="Pindrop community — built in the open"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   <Header />
 
   <main class="pt-36 pb-24 px-6">

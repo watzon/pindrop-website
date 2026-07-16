@@ -69,15 +69,23 @@ const comparison = [
   { feature: 'Open Source',        pindrop: 'MIT',  handy: 'MIT', openwhispr: 'MIT', superwhisper: false },
 ];
 
+const description = 'Open-source, privacy-first AI dictation for macOS. Transcribe speech entirely on-device with five local engines, global hotkeys, and a searchable history.';
+
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Pindrop",
+  "description": description,
+  "url": new URL('/', Astro.site).toString(),
+  "image": new URL('/og/home.png', Astro.site).toString(),
   "applicationCategory": "ProductivityApplication",
   "operatingSystem": "macOS",
+  "softwareRequirements": "macOS 14 or later",
   "softwareVersion": version,
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "downloadUrl": downloadUrl,
+  "isAccessibleForFree": true,
+  "license": "https://opensource.org/license/mit",
   "featureList": "Streaming transcription, Global hotkeys, Speaker diarization, Custom vocabulary, AI enhancement, Transcription library",
   "author": { "@type": "Organization", "name": "Pindrop" }
 };
@@ -87,7 +95,11 @@ function cell(value: boolean | string, isPindrop: boolean) {
 }
 ---
 
-<Layout title="Pindrop — Mac-Native AI Dictation">
+<Layout
+  title="Pindrop — Mac-Native AI Dictation"
+  description={description}
+  imageAlt="Pindrop — open-source, on-device dictation for Mac"
+>
 <script type="application/ld+json" set:html={JSON.stringify(softwareSchema)} />
 
 <Header />
