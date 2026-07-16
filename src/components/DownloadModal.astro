@@ -1,5 +1,4 @@
 ---
-import Button from './Button.astro';
 import Icon from './Icon.astro';
 ---
 
@@ -8,125 +7,81 @@ import Icon from './Icon.astro';
   <!-- Backdrop -->
   <div
     id="modal-backdrop"
-    class="absolute inset-0 bg-dark/70 backdrop-blur-sm transition-opacity duration-300 opacity-0"
+    class="absolute inset-0 bg-[rgba(6,6,10,0.75)] backdrop-blur-sm transition-opacity duration-300 opacity-0"
   ></div>
 
   <!-- Panel -->
   <div class="absolute inset-0 flex items-center justify-center p-4">
     <div
       id="modal-panel"
-      class="relative w-full max-w-xl transform transition-all duration-300 scale-95 opacity-0"
+      class="relative w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
     >
-      <!-- Outer bezel -->
-      <div class="p-0.5 bg-white/8 border border-white/10 rounded-[2rem] shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
-        <!-- Inner card -->
-        <div class="relative overflow-hidden rounded-[calc(2rem-2px)] bg-dark-surface">
+      <div class="surface-high relative overflow-hidden rounded-2xl p-8">
 
-          <!-- Ambient blobs (fixed, pointer-events-none) -->
-          <div class="absolute -top-20 -right-20 w-56 h-56 bg-brand-orange/20 rounded-full blur-[60px] pointer-events-none"></div>
-          <div class="absolute -bottom-20 -left-20 w-56 h-56 bg-brand-pink/20 rounded-full blur-[60px] pointer-events-none"></div>
+        <button
+          id="modal-close"
+          class="absolute top-4 right-4 p-2 rounded-lg text-ink-3 hover:text-ink hover:bg-[rgba(240,233,225,0.05)] transition-colors"
+          aria-label="Close"
+        >
+          <Icon name="x" size={16} />
+        </button>
 
-          <!-- Close -->
-          <button
-            id="modal-close"
-            class="absolute top-4 right-4 p-2 rounded-full text-dark-muted hover:text-dark-text hover:bg-white/6 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            aria-label="Close"
+        <h2 id="modal-title" class="text-2xl text-ink mb-2 pr-8">
+          Your download is starting
+        </h2>
+        <p class="text-sm text-ink-2 leading-relaxed mb-7">
+          Open the DMG, drag Pindrop to Applications, and press your hotkey.
+          If the download didn't begin, <a id="modal-retry" href="#" class="text-ember-bright hover:text-ink transition-colors underline underline-offset-4 decoration-[rgba(242,181,74,0.35)]">grab it here</a>.
+        </p>
+
+        <div class="flex flex-col divide-y divide-[rgba(240,233,225,0.06)] border-y border-[rgba(240,233,225,0.06)]">
+          <a
+            href="https://github.com/watzon/pindrop"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center gap-3 py-3.5 text-ink-2 hover:text-ink transition-colors"
           >
-            <Icon name="x" size={18} />
-          </button>
-
-          <div class="relative z-10 p-8 md:p-10 space-y-8 text-center">
-
-            <!-- Header -->
-            <div class="space-y-2">
-              <p class="tag mx-auto w-fit">Download started</p>
-              <h2 id="modal-title" class="text-3xl md:text-4xl font-bold text-dark-text tracking-tight">
-                Thanks for trying Pindrop
-              </h2>
-              <p class="text-dark-muted">
-                Your download should begin automatically.
-              </p>
-            </div>
-
-            <!-- Cards -->
-            <div class="grid md:grid-cols-2 gap-4 text-left">
-
-              <!-- GitHub star -->
-              <div class="p-0.5 bg-white/4 border border-white/8 rounded-[1.5rem] hover:border-brand-orange/30 transition-colors duration-300">
-                <div class="rounded-[calc(1.5rem-2px)] bg-dark-2 p-6 space-y-4 flex flex-col h-full">
-                  <div class="w-11 h-11 rounded-2xl bg-white/6 border border-white/8 flex items-center justify-center text-dark-text">
-                    <Icon name="github" size={22} />
-                  </div>
-                  <div class="flex-1 space-y-1.5">
-                    <h3 class="text-base font-semibold text-dark-text">Star on GitHub</h3>
-                    <p class="text-sm text-dark-muted leading-relaxed">
-                      Give us a star to help others discover the project.
-                    </p>
-                  </div>
-                  <a
-                    href="https://github.com/watzon/pindrop"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-white/8 border border-white/10 text-sm font-medium text-dark-text hover:bg-white/12 transition-colors"
-                  >
-                    <Icon name="github" size={16} />
-                    Star Project
-                  </a>
-                </div>
-              </div>
-
-              <!-- Sponsor -->
-              <div class="p-0.5 bg-white/4 border border-white/8 rounded-[1.5rem] hover:border-brand-pink/30 transition-colors duration-300">
-                <div class="rounded-[calc(1.5rem-2px)] bg-dark-2 p-6 space-y-4 flex flex-col h-full">
-                  <div class="w-11 h-11 rounded-2xl bg-linear-to-br from-brand-orange to-brand-pink flex items-center justify-center text-white">
-                    <Icon name="heart" size={20} />
-                  </div>
-                  <div class="flex-1 space-y-1.5">
-                    <h3 class="text-base font-semibold text-dark-text">Support Development</h3>
-                    <p class="text-sm text-dark-muted leading-relaxed">
-                      Help sustain ongoing work and new features.
-                    </p>
-                  </div>
-                  <div class="space-y-2">
-                    <a
-                      href="https://github.com/sponsors/watzon"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-linear-to-r from-brand-orange to-brand-pink text-sm font-semibold text-white hover:opacity-90 transition-opacity"
-                    >
-                      <Icon name="heart" size={16} />
-                      GitHub Sponsors
-                    </a>
-                    <a
-                      href="https://ko-fi.com/watzon"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="block text-center text-xs text-dark-muted hover:text-dark-text transition-colors"
-                    >
-                      Or donate via Ko-Fi &rarr;
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Dismiss -->
-            <button
-              id="modal-dismiss"
-              class="text-sm text-dark-muted hover:text-dark-text transition-colors"
-            >
-              No thanks, just the download
-            </button>
-
-          </div>
+            <Icon name="github" size={16} />
+            <span class="text-sm font-medium">Star the project on GitHub</span>
+            <span class="ml-auto"><Icon name="arrow-up-right" size={13} class="text-ink-3 group-hover:text-ink transition-colors" /></span>
+          </a>
+          <a
+            href="https://github.com/sponsors/watzon"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center gap-3 py-3.5 text-ink-2 hover:text-ink transition-colors"
+          >
+            <Icon name="heart" size={16} />
+            <span class="text-sm font-medium">Sponsor development</span>
+            <span class="ml-auto"><Icon name="arrow-up-right" size={13} class="text-ink-3 group-hover:text-ink transition-colors" /></span>
+          </a>
+          <a
+            href="https://ko-fi.com/watzon"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center gap-3 py-3.5 text-ink-2 hover:text-ink transition-colors"
+          >
+            <Icon name="coffee" size={16} />
+            <span class="text-sm font-medium">Or leave a tip on Ko-Fi</span>
+            <span class="ml-auto"><Icon name="arrow-up-right" size={13} class="text-ink-3 group-hover:text-ink transition-colors" /></span>
+          </a>
         </div>
+
+        <button
+          id="modal-dismiss"
+          class="mt-6 text-sm text-ink-3 hover:text-ink transition-colors"
+        >
+          Close
+        </button>
+
       </div>
     </div>
   </div>
 </div>
 
 <script>
+  let lastUrl = '';
+
   function getEls() {
     return {
       modal:    document.getElementById('download-modal'),
@@ -138,6 +93,10 @@ import Icon from './Icon.astro';
   function openDownloadModal(url: string) {
     const { modal, backdrop, panel } = getEls();
     if (!modal || !backdrop || !panel) return;
+
+    lastUrl = url;
+    const retry = document.getElementById('modal-retry');
+    if (retry) retry.setAttribute('href', url);
 
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -186,6 +145,7 @@ import Icon from './Icon.astro';
   }
 
   document.addEventListener('astro:page-load', setupListeners);
+  setupListeners();
   document.addEventListener('keydown', (e) => {
     const modal = document.getElementById('download-modal');
     if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {

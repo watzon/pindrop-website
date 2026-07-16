@@ -13,7 +13,7 @@ interface Props {
   tags?: string[];
 }
 
-const { id, title, description, date, version, tags } = Astro.props;
+const { id, title, description, date, version } = Astro.props;
 
 // Derive OG image URL from post id if available, otherwise fall back to home OG
 const ogImage = id ? `/og/blog/${id}.png` : undefined;
@@ -22,6 +22,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
+  timeZone: 'UTC',
 });
 
 const articleSchema = {
@@ -43,8 +44,7 @@ const articleSchema = {
       "@type": "ImageObject",
       "url": new URL('/favicon.svg', Astro.site).toString()
     }
-  },
-  "keywords": tags?.join(", ") || "Pindrop, dictation, AI, macOS"
+  }
 };
 ---
 
@@ -53,53 +53,39 @@ const articleSchema = {
 
 <Header />
 
-<main class="pt-32 pb-24 px-6">
+<main class="pt-36 pb-24 px-6">
   <div class="max-w-3xl mx-auto">
 
-    <!-- Back link -->
     <a
       href="/blog"
-      class="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors duration-200 mb-14 group"
+      class="btn-quiet text-sm mb-14"
     >
-      <div class="w-7 h-7 rounded-full bg-surface border border-border flex items-center justify-center group-hover:border-border-strong group-hover:-translate-x-0.5 transition-all duration-200">
-        <Icon name="chevron-right" size={13} class="rotate-180" />
-      </div>
-      Back to Blog
+      <Icon name="arrow-right" size={14} class="rotate-180" />
+      All posts
     </a>
 
     <article>
 
-      <!-- Article header -->
-      <header class="mb-16 space-y-6">
-        <div class="flex flex-wrap items-center gap-3">
-          <time datetime={date.toISOString()} class="text-sm font-mono text-text-muted">
+      <header class="mb-14">
+        <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5">
+          <time datetime={date.toISOString()} class="data text-ink-3">
             {formattedDate}
           </time>
           {version && (
-            <span class="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-accent-subtle text-accent border border-accent/20">
-              v{version}
-            </span>
+            <span class="data text-ember-bright">v{version}</span>
           )}
-          {tags?.map(tag => (
-            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-surface border border-border text-text-muted">
-              {tag}
-            </span>
-          ))}
         </div>
 
-        <h1 class="text-4xl md:text-5xl lg:text-[3.25rem] font-bold tracking-tight text-text-primary leading-[1.07]">
+        <h1 class="text-4xl md:text-5xl text-ink m-0 leading-[1.1]">
           {title}
         </h1>
 
-        <p class="text-lg md:text-xl text-text-secondary leading-relaxed">
+        <p class="mt-6 font-display italic text-xl text-ink-3 leading-relaxed m-0">
           {description}
         </p>
-
-        <div class="divider"></div>
       </header>
 
-      <!-- Post body -->
-      <div class="blog-content">
+      <div class="prose">
         <slot />
       </div>
 
@@ -109,87 +95,3 @@ const articleSchema = {
 
 <Footer />
 </Layout>
-
-<style>
-  @reference "../styles/global.css";
-
-  .blog-content {
-    @apply text-base md:text-lg text-text-secondary leading-relaxed;
-  }
-
-  .blog-content :global(h2) {
-    @apply text-2xl md:text-3xl font-bold tracking-tight text-text-primary mt-16 mb-5 scroll-mt-32;
-  }
-
-  .blog-content :global(h3) {
-    @apply text-xl md:text-2xl font-bold tracking-tight text-text-primary mt-10 mb-4 scroll-mt-32;
-  }
-
-  .blog-content :global(h4) {
-    @apply text-lg font-semibold text-text-primary mt-8 mb-3 scroll-mt-32;
-  }
-
-  .blog-content :global(p) {
-    @apply mb-6;
-  }
-
-  .blog-content :global(ul) {
-    @apply list-disc list-outside ml-6 mb-8 space-y-2;
-  }
-
-  .blog-content :global(ol) {
-    @apply list-decimal list-outside ml-6 mb-8 space-y-2;
-  }
-
-  .blog-content :global(li) {
-    @apply pl-2;
-  }
-
-  .blog-content :global(a) {
-    @apply text-accent hover:text-accent-dark transition-colors underline decoration-accent/30 hover:decoration-accent underline-offset-4;
-  }
-
-  .blog-content :global(strong) {
-    @apply text-text-primary font-semibold;
-  }
-
-  .blog-content :global(em) {
-    @apply italic;
-  }
-
-  .blog-content :global(blockquote) {
-    @apply border-l-2 border-accent/40 pl-6 my-8 text-text-muted italic;
-  }
-
-  .blog-content :global(code) {
-    @apply font-mono text-sm bg-surface text-accent px-1.5 py-0.5 rounded-md border border-border;
-  }
-
-  .blog-content :global(pre) {
-    @apply bg-dark rounded-2xl p-6 border border-dark-border overflow-x-auto mb-8 text-sm leading-relaxed;
-  }
-
-  .blog-content :global(pre code) {
-    @apply bg-transparent p-0 text-dark-text border-none text-sm;
-  }
-
-  .blog-content :global(img) {
-    @apply rounded-2xl border border-border shadow-md my-8 w-full h-auto;
-  }
-
-  .blog-content :global(hr) {
-    @apply border-border my-12;
-  }
-
-  .blog-content :global(table) {
-    @apply w-full text-sm border-collapse mb-8;
-  }
-
-  .blog-content :global(th) {
-    @apply text-left font-semibold text-text-primary p-3 border-b border-border bg-surface;
-  }
-
-  .blog-content :global(td) {
-    @apply p-3 border-b border-border text-text-secondary;
-  }
-</style>

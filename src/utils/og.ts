@@ -3,39 +3,45 @@ import { Resvg } from '@resvg/resvg-js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-// ─── Palette ────────────────────────────────────────────────
+// ─── Palette — the quiet room, lit by the orb (Pindrop theme) ───────────────
 const C = {
-  cream:   '#F9F8F6',
-  surface: '#EDEAE4',
-  border:  '#D8D3CA',
-  dark:    '#111110',
-  mid:     '#5C5850',
-  muted:   '#9C9690',
-  accent:  '#C84B2B',
-  accentBg:'#F6EAE5',
-  white:   '#FFFFFF',
+  night:  '#0A0A0F',
+  soot:   '#12121A',
+  ink:    '#F0E9E1',
+  ink2:   '#C0B3A6',
+  ink3:   '#948779',
+  ember:  '#C48A1E',
+  emberBright: '#F2B54A',
+  russet: '#713413',
 } as const;
 
 // ─── Local fonts ─────────────────────────────────────────────
 // process.cwd() is the project root during Astro's static build.
 // Satori supports OTF, TTF, and WOFF (not WOFF2).
-let _regular: Buffer | null = null;
-let _bold: Buffer | null = null;
+let _fonts: { regular: Buffer; bold: Buffer; italic: Buffer; mono: Buffer } | null = null;
 
 function loadFonts() {
-  if (!_regular) _regular = readFileSync(join(process.cwd(), 'src/assets/fonts/SpaceGrotesk-Regular.otf'));
-  if (!_bold)    _bold    = readFileSync(join(process.cwd(), 'src/assets/fonts/SpaceGrotesk-Bold.otf'));
-  return { regular: _regular, bold: _bold };
+  if (!_fonts) {
+    _fonts = {
+      regular: readFileSync(join(process.cwd(), 'src/assets/fonts/Sentient-Regular.otf')),
+      bold:    readFileSync(join(process.cwd(), 'src/assets/fonts/Sentient-Bold.otf')),
+      italic:  readFileSync(join(process.cwd(), 'src/assets/fonts/Sentient-Italic.otf')),
+      mono:    readFileSync(join(process.cwd(), 'src/assets/fonts/ServerMono-Regular.otf')),
+    };
+  }
+  return _fonts;
 }
 
 function satoriOptions() {
-  const { regular, bold } = loadFonts();
+  const { regular, bold, italic, mono } = loadFonts();
   return {
     width: 1200,
     height: 630,
     fonts: [
-      { name: 'SG', data: regular.buffer, weight: 400 as const, style: 'normal' as const },
-      { name: 'SG', data: bold.buffer,    weight: 700 as const, style: 'normal' as const },
+      { name: 'Sentient', data: regular.buffer, weight: 400 as const, style: 'normal' as const },
+      { name: 'Sentient', data: bold.buffer,    weight: 700 as const, style: 'normal' as const },
+      { name: 'Sentient', data: italic.buffer,  weight: 400 as const, style: 'italic' as const },
+      { name: 'Mono',     data: mono.buffer,    weight: 400 as const, style: 'normal' as const },
     ],
   };
 }
@@ -43,11 +49,6 @@ function satoriOptions() {
 // ─── Helpers ─────────────────────────────────────────────────
 function trunc(s: string, n: number) {
   return s.length > n ? s.slice(0, n - 1) + '…' : s;
-}
-
-// Shorthand for a single-child element used as a visual separator / spacer
-function spacer(height: number) {
-  return el('div', { height: `${height}px` });
 }
 
 // Minimal element factory — satori needs explicit display on every multi-child div.
@@ -72,120 +73,82 @@ function text(content: string, style: StyleObj) {
   return el('span', style, content);
 }
 
-// ─── Shared layout elements ───────────────────────────────────
+// ─── Shared pieces ───────────────────────────────────────────
 
-function accentStrip() {
+/** The orb: amber→russet jewel with its own emitted light, drawn as nested gradients. */
+function orb(size: number, x: number, y: number) {
+  const glow = size * 2.2;
   return el('div', {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 6,
-    height: 630,
-    backgroundColor: C.accent,
-  });
-}
-
-function logoRow(right: any) {
-  return flex({ alignItems: 'center', justifyContent: 'space-between' },
-    flex({ alignItems: 'center', gap: 10 },
-      el('div', {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: C.accent,
-      }),
-      text('Pindrop', {
-        fontFamily: 'SG',
-        fontWeight: 700,
-        fontSize: 22,
-        color: C.dark,
-        letterSpacing: '-0.03em',
-      })
-    ),
-    right
+    left: x - glow / 2,
+    top: y - glow / 2,
+    width: glow,
+    height: glow,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundImage: `radial-gradient(circle at 50% 50%, rgba(242,181,74,0.26) 0%, rgba(242,181,74,0.09) 45%, rgba(242,181,74,0) 70%)`,
+  },
+    el('div', {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundImage: `radial-gradient(circle at 36% 32%, #FFE9BC 0%, #FCD07E 34%, ${C.emberBright} 58%, #B06A24 82%, ${C.russet} 100%)`,
+    })
   );
 }
 
-function dividerBar() {
-  return el('div', {
-    width: '100%',
-    height: 1,
-    backgroundColor: C.border,
-  });
+function pageBase(...children: any[]) {
+  return col({
+    width: 1200,
+    height: 630,
+    backgroundColor: C.night,
+    backgroundImage: 'radial-gradient(circle at 50% -20%, rgba(242,181,74,0.08) 0%, rgba(242,181,74,0) 60%)',
+    fontFamily: 'Sentient',
+    position: 'relative',
+    paddingTop: 64,
+    paddingRight: 80,
+    paddingBottom: 56,
+    paddingLeft: 80,
+  }, ...children);
 }
 
 // ─── Home OG ─────────────────────────────────────────────────
 
 function homeElement() {
-  return col({
-    width: 1200,
-    height: 630,
-    backgroundColor: C.cream,
-    fontFamily: 'SG',
-    position: 'relative',
-    paddingTop: 56,
-    paddingRight: 72,
-    paddingBottom: 56,
-    paddingLeft: 80,
-  },
-    // Absolute accent strip — positioned as a sibling, but satori handles absolute siblings fine
-    // We place it first so it renders behind everything
-    accentStrip(),
+  return pageBase(
+    orb(190, 985, 315),
 
-    // Vertical flex column for content (takes remaining space)
     col({ flex: 1 },
-      // Top row
-      logoRow(
-        text('pindrop.dev', { fontSize: 16, color: C.muted, fontFamily: 'SG' })
-      ),
+      text('Pindrop', { fontSize: 26, color: C.ink, fontWeight: 700, letterSpacing: '-0.01em' }),
 
-      spacer(52),
-
-      // Headline block
       col({ flex: 1, justifyContent: 'center' },
-        el('div', {
-          fontFamily: 'SG',
-          fontWeight: 700,
-          fontSize: 76,
-          color: C.dark,
-          letterSpacing: '-0.04em',
-          lineHeight: 1.06,
-          marginBottom: 28,
-          whiteSpace: 'pre-wrap',
-        }, 'Dictation that\nrespects you.'),
-
-        text('Mac-native · On-device AI · MIT License', {
-          fontFamily: 'SG',
-          fontSize: 22,
-          color: C.mid,
-          letterSpacing: '-0.01em',
+        flex({ alignItems: 'baseline' },
+          text('You talk. It', {
+            fontSize: 84,
+            fontWeight: 700,
+            color: C.ink,
+            letterSpacing: '-0.02em',
+            marginRight: 22,
+          }),
+          text('types.', {
+            fontSize: 84,
+            fontStyle: 'italic',
+            color: C.emberBright,
+            letterSpacing: '-0.02em',
+          })
+        ),
+        el('div', { height: 26 }),
+        text('Open-source dictation that runs entirely on your Mac.', {
+          fontSize: 26,
+          color: C.ink2,
+          maxWidth: 760,
         })
       ),
 
-      spacer(40),
-      dividerBar(),
-      spacer(24),
-
-      // Bottom row
       flex({ alignItems: 'center', justifyContent: 'space-between' },
-        text('macOS 14 Sonoma or later', { fontSize: 15, color: C.muted, fontFamily: 'SG' }),
-        flex({
-          alignItems: 'center',
-          backgroundColor: C.accent,
-          paddingTop: 8,
-          paddingBottom: 8,
-          paddingLeft: 20,
-          paddingRight: 20,
-          borderRadius: 100,
-        },
-          text('Free forever', {
-            fontFamily: 'SG',
-            fontSize: 14,
-            fontWeight: 700,
-            color: C.white,
-            letterSpacing: '-0.01em',
-          })
-        )
+        text('pindrop.dev', { fontFamily: 'Mono', fontSize: 18, color: C.ink3 }),
+        text('macOS 14+ · on-device · MIT', { fontFamily: 'Mono', fontSize: 18, color: C.ink3 })
       )
     )
   );
@@ -204,96 +167,40 @@ function blogPostElement(opts: {
     year: 'numeric', month: 'long', day: 'numeric'
   });
 
-  const versionBadge = version
-    ? flex({
-        alignItems: 'center',
-        backgroundColor: C.accentBg,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingLeft: 16,
-        paddingRight: 16,
-        borderRadius: 100,
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: 'rgba(200,75,43,0.25)',
-      },
-        text(`v${version}`, {
-          fontFamily: 'SG',
-          fontSize: 14,
-          fontWeight: 700,
-          color: C.accent,
-          letterSpacing: '0.01em',
-        })
-      )
-    : text('', { fontSize: 1 }); // invisible placeholder
-
-  return col({
-    width: 1200,
-    height: 630,
-    backgroundColor: C.cream,
-    fontFamily: 'SG',
-    position: 'relative',
-    paddingTop: 56,
-    paddingRight: 72,
-    paddingBottom: 56,
-    paddingLeft: 80,
-  },
-    accentStrip(),
+  return pageBase(
+    orb(72, 1075, 96),
 
     col({ flex: 1 },
-      // Top row: blog label + version
-      flex({ alignItems: 'center', justifyContent: 'space-between' },
-        flex({ alignItems: 'center', gap: 10 },
-          el('div', {
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: C.accent,
-          }),
-          text('Pindrop Blog', {
-            fontFamily: 'SG',
-            fontSize: 14,
-            fontWeight: 700,
-            color: C.mid,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-          })
-        ),
-        versionBadge
+      flex({ alignItems: 'center', gap: 16 },
+        text('Pindrop Blog', { fontSize: 22, color: C.ink, fontWeight: 700 }),
+        version
+          ? text(`v${version}`, { fontFamily: 'Mono', fontSize: 18, color: C.emberBright })
+          : text('', { fontSize: 1 })
       ),
 
-      spacer(44),
-
-      // Title + description block
       col({ flex: 1, justifyContent: 'center' },
         el('div', {
-          fontFamily: 'SG',
-          fontWeight: 700,
           fontSize: 58,
-          color: C.dark,
-          letterSpacing: '-0.035em',
-          lineHeight: 1.1,
-          marginBottom: 20,
-          maxWidth: 800,
+          fontWeight: 700,
+          color: C.ink,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.12,
+          marginBottom: 24,
+          maxWidth: 920,
         }, trunc(title, 80)),
 
         el('div', {
-          fontFamily: 'SG',
-          fontSize: 20,
-          color: C.mid,
-          lineHeight: 1.5,
-          maxWidth: 680,
-        }, trunc(description, 120))
+          fontSize: 24,
+          fontStyle: 'italic',
+          color: C.ink3,
+          lineHeight: 1.45,
+          maxWidth: 760,
+        }, trunc(description, 130))
       ),
 
-      spacer(36),
-      dividerBar(),
-      spacer(24),
-
-      // Bottom row: date + domain
       flex({ alignItems: 'center', justifyContent: 'space-between' },
-        text(dateStr, { fontFamily: 'SG', fontSize: 15, color: C.muted }),
-        text('pindrop.dev', { fontFamily: 'SG', fontSize: 15, color: C.muted })
+        text(dateStr, { fontFamily: 'Mono', fontSize: 18, color: C.ink3 }),
+        text('pindrop.dev', { fontFamily: 'Mono', fontSize: 18, color: C.ink3 })
       )
     )
   );

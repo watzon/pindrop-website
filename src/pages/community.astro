@@ -6,156 +6,124 @@ import Icon from '../components/Icon.astro';
 
 const resources = [
   {
-    icon: 'github',
     title: 'GitHub Repository',
     description: 'Browse the source, open pull requests, and track the roadmap.',
     link: 'https://github.com/watzon/pindrop',
-    cta: 'View Repository',
   },
   {
-    icon: 'sparkles',
-    title: 'GitHub Discussions',
-    description: 'Ask questions, share ideas, and get help from other users.',
+    title: 'Discussions',
+    description: 'Ask questions, share setups, and get help from other users.',
     link: 'https://github.com/watzon/pindrop/discussions',
-    cta: 'Join Discussion',
   },
   {
-    icon: 'shield',
     title: 'Issue Tracker',
-    description: 'Found a bug? Report it so we can fix it in the next release.',
+    description: 'Found a bug? Report it so it can ship fixed in the next release.',
     link: 'https://github.com/watzon/pindrop/issues',
-    cta: 'Report Issue',
   },
 ];
 
 const faqItems = [
   {
     question: 'Does Pindrop work on Intel Macs?',
-    answer: 'Yes, Pindrop runs on Intel Macs, but it\'s highly optimized for Apple Silicon (M1 and later) via the Neural Engine. Intel users will see good performance with the smaller models.'
+    answer: 'Yes. Pindrop runs on Intel, but it is tuned for Apple Silicon, where transcription runs on the Neural Engine. On Intel, the smaller models are the comfortable choice.'
   },
   {
     question: 'Is my data sent anywhere?',
-    answer: 'Transcription is 100% local — your voice never leaves your Mac. Optional AI enhancement can be configured to use external services (OpenAI, OpenRouter) or kept local with Ollama or LM Studio. You control where data goes.'
+    answer: 'Transcription is 100% local; your voice never leaves your Mac. Optional AI enhancement can use external services (Anthropic, OpenAI, OpenRouter) or stay local with Ollama or LM Studio. You decide where anything goes.'
   },
   {
     question: 'What languages are supported?',
-    answer: 'Pindrop currently performs best in English. Whisper models do support many languages, and we\'re working on first-class multi-language support in upcoming releases.'
+    answer: 'The interface speaks more than 30 languages, and you can dictate in dozens more depending on the engine, including Spanish, French, German, Chinese, Russian, Ukrainian, Polish, Hindi, and Malayalam.'
   },
   {
     question: 'How is this different from macOS Dictation?',
-    answer: 'macOS Dictation sends audio to Apple\'s servers unless you have Enhanced Dictation enabled. Pindrop is always offline-first, supports much larger and more accurate Whisper models, includes transcription history, custom vocabulary, AI enhancement, and is fully open source.'
+    answer: 'macOS Dictation may send audio to Apple\'s servers and offers little control. Pindrop is always offline-first, lets you choose between five local recognition engines, keeps a searchable history, learns your vocabulary, and is fully open source.'
   },
   {
     question: 'Can I contribute?',
-    answer: 'Absolutely. Pindrop is MIT-licensed and welcomes contributions of all kinds — bug fixes, new features, documentation, and translations. Check out the Contributing Guide on GitHub to get started.'
+    answer: 'Absolutely. Pindrop is MIT-licensed and welcomes bug fixes, features, documentation, and translations. Several recent releases shipped contributor work, from Bluetooth mic fixes to whole new dictation languages.'
   },
 ];
 ---
 
-<Layout title="Community & Support — Pindrop">
+<Layout title="Community & Support — Pindrop" description="Where Pindrop gets built: GitHub, Discussions, and the people dictating in thirty languages.">
   <Header />
 
-  <main class="pt-32 pb-24 px-6">
-    <div class="max-w-6xl mx-auto space-y-32">
+  <main class="pt-36 pb-24 px-6">
+    <div class="max-w-4xl mx-auto">
 
-      <!-- Hero -->
-      <section class="max-w-2xl space-y-5 animate-fade-up">
-        <p class="tag">Community</p>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-text-primary leading-[1.06]">
-          Built together,<br />used by everyone
+      <header class="mb-20">
+        <h1 class="text-5xl md:text-6xl text-ink m-0 leading-[1.05]">
+          Built in the <em class="display-italic text-ember-bright">open</em>
         </h1>
-        <p class="text-xl text-text-secondary leading-relaxed">
-          Pindrop is open source and community-driven. Get help, report issues,
-          and shape what comes next.
+        <p class="mt-5 text-lg text-ink-2 max-w-[50ch] leading-relaxed">
+          Pindrop is one codebase, no company, and a growing set of
+          contributors. Get help, report bugs, and shape what ships next.
         </p>
-      </section>
+      </header>
 
-      <!-- Resources — horizontal list, no 3-col card grid -->
-      <section>
-        <h2 class="text-xs uppercase tracking-widest font-semibold text-text-muted mb-8 reveal">Get involved</h2>
-        <div class="divide-y divide-border border-t border-b border-border">
-          {resources.map((r, i) => (
+      <!-- Resources -->
+      <section class="mb-24">
+        <div class="flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-y border-[rgba(240,233,225,0.07)]">
+          {resources.map(r => (
             <a
               href={r.link}
               target="_blank"
               rel="noopener noreferrer"
-              class={`group flex items-center justify-between gap-6 py-7 hover:bg-surface/40 -mx-6 px-6 transition-colors duration-200 reveal delay-${i + 1}`}
+              class="group flex items-center justify-between gap-6 py-7"
             >
-              <div class="flex items-start gap-5">
-                <div class="w-10 h-10 shrink-0 rounded-xl bg-surface border border-border text-accent flex items-center justify-center group-hover:bg-accent-subtle group-hover:border-accent/20 transition-colors duration-300">
-                  <Icon name={r.icon as any} size={18} />
-                </div>
-                <div>
-                  <h3 class="font-semibold text-text-primary mb-1 group-hover:text-accent transition-colors duration-200">{r.title}</h3>
-                  <p class="text-sm text-text-secondary">{r.description}</p>
-                </div>
+              <div>
+                <h2 class="font-body text-base font-semibold text-ink m-0 mb-1 group-hover:text-ember-bright transition-colors duration-200">{r.title}</h2>
+                <p class="text-sm text-ink-2 m-0">{r.description}</p>
               </div>
-              <div class="flex items-center gap-2 shrink-0 text-sm font-medium text-text-muted group-hover:text-accent transition-colors duration-200">
-                <span class="hidden sm:inline">{r.cta}</span>
-                <Icon name="arrow-right" size={16} />
-              </div>
+              <Icon name="arrow-up-right" size={16} class="shrink-0 text-ink-3 group-hover:text-ink transition-colors duration-200" />
             </a>
           ))}
         </div>
       </section>
 
-      <!-- Contributing CTA -->
-      <section class="reveal">
-        <div class="p-0.5 bg-black/4 border border-border rounded-[2rem]">
-          <div class="bg-dark rounded-[calc(2rem-2px)] px-8 md:px-12 py-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-            <div class="space-y-3 max-w-lg text-center md:text-left">
-              <h2 class="text-2xl md:text-3xl font-bold text-dark-text tracking-tight">
-                Want to contribute?
-              </h2>
-              <p class="text-dark-muted leading-relaxed">
-                We welcome bug fixes, new features, documentation, and translations.
-                Read the contributing guide to get oriented quickly.
-              </p>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-              <a
-                href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center justify-center gap-2 bg-cream text-dark font-semibold px-6 py-3 rounded-full hover:bg-cream-dark transition-all duration-200 active:scale-[0.97] text-sm"
-              >
-                <Icon name="github" size={16} />
-                Contributing Guide
-              </a>
-              <a
-                href="https://github.com/watzon/pindrop/blob/main/CODE_OF_CONDUCT.md"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center justify-center gap-2 border border-white/12 text-dark-text font-medium px-6 py-3 rounded-full hover:bg-white/6 transition-all duration-200 active:scale-[0.97] text-sm"
-              >
-                Code of Conduct
-              </a>
-            </div>
-          </div>
+      <!-- Contributing -->
+      <section class="mb-24">
+        <p class="font-display text-[clamp(1.5rem,3vw,2.125rem)] leading-[1.25] text-ink max-w-2xl m-0">
+          Recent releases shipped contributor work: new dictation languages,
+          Bluetooth microphone fixes, better defaults.
+          <em class="display-italic">Yours could be next.</em>
+        </p>
+        <div class="mt-8 flex flex-wrap gap-x-8 gap-y-3">
+          <a
+            href="https://github.com/watzon/pindrop/blob/main/CONTRIBUTING.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-quiet text-sm"
+          >
+            <Icon name="github" size={15} />
+            Contributing guide
+            <Icon name="arrow-up-right" size={13} />
+          </a>
+          <a
+            href="https://github.com/watzon/pindrop/blob/main/CODE_OF_CONDUCT.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-quiet text-sm"
+          >
+            Code of conduct
+            <Icon name="arrow-up-right" size={13} />
+          </a>
         </div>
       </section>
 
       <!-- FAQ -->
       <section class="max-w-3xl">
-        <div class="mb-10 reveal">
-          <p class="tag mb-4">Common questions</p>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-text-primary">
-            Frequently asked
-          </h2>
-        </div>
+        <h2 class="text-3xl md:text-4xl text-ink m-0 mb-8">Common questions</h2>
 
-        <div class="space-y-0 divide-y divide-border border-t border-border">
-          {faqItems.map((item, i) => (
-            <details class={`group reveal delay-${i + 1}`}>
+        <div class="flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-t border-[rgba(240,233,225,0.07)]">
+          {faqItems.map(item => (
+            <details class="group">
               <summary class="flex items-center justify-between gap-4 py-5 cursor-pointer list-none select-none">
-                <h3 class="font-semibold text-text-primary text-base">{item.question}</h3>
-                <div class="w-7 h-7 shrink-0 rounded-full bg-surface border border-border flex items-center justify-center text-text-muted group-open:rotate-90 transition-transform duration-200">
-                  <Icon name="chevron-right" size={14} />
-                </div>
+                <h3 class="font-body font-semibold text-ink text-[0.9375rem] m-0">{item.question}</h3>
+                <Icon name="chevron-right" size={15} class="shrink-0 text-ink-3 group-open:rotate-90 transition-transform duration-200" />
               </summary>
-              <div class="pb-6">
-                <p class="text-text-secondary leading-relaxed text-sm">{item.answer}</p>
-              </div>
+              <p class="pb-6 text-sm text-ink-2 leading-relaxed m-0 max-w-[62ch]">{item.answer}</p>
             </details>
           ))}
         </div>

@@ -1,6 +1,6 @@
 ---
 export interface Props {
-  name: 'mic' | 'download' | 'shield' | 'zap' | 'sparkles' | 'keyboard' | 'github' | 'apple' | 'heart' | 'x' | 'arrow-right' | 'chevron-right' | 'check' | 'external';
+  name: 'mic' | 'download' | 'shield' | 'zap' | 'sparkles' | 'keyboard' | 'github' | 'apple' | 'heart' | 'x' | 'arrow-right' | 'arrow-up-right' | 'chevron-right' | 'check' | 'external' | 'coffee';
   size?: number;
   class?: string;
 }
@@ -101,6 +101,20 @@ const { name, size = 24, class: className = '' } = Astro.props;
     <>
       <path d="M5 12h14"></path>
       <path d="m12 5 7 7-7 7"></path>
+    </>
+  )}
+
+  {name === 'arrow-up-right' && (
+    <>
+      <path d="M7 17 17 7"></path>
+      <path d="M8 7h9v9"></path>
+    </>
+  )}
+
+  {name === 'coffee' && (
+    <>
+      <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+      <path d="M3 8h14v7a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
     </>
   )}
 

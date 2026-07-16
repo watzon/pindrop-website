@@ -3,79 +3,49 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection } from 'astro:content';
-import Icon from '../../components/Icon.astro';
 
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
-const title = 'Blog & Changelog';
-const description = 'Release notes, updates, and announcements for Pindrop.';
+const title = 'Blog';
+const description = 'Longer-form updates from Pindrop: release deep-dives, design notes, and where the project is headed.';
 ---
 
 <Layout title={`${title} — Pindrop`} description={description}>
   <Header />
 
-  <main class="pt-32 pb-24 px-6">
-    <div class="max-w-6xl mx-auto">
+  <main class="pt-36 pb-24 px-6">
+    <div class="max-w-4xl mx-auto">
 
-      <!-- Header -->
-      <header class="max-w-xl mb-20 animate-fade-up space-y-4">
-        <p class="tag">Updates</p>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-text-primary leading-[1.06]">
-          Blog &amp; Changelog
-        </h1>
-        <p class="text-text-secondary leading-relaxed">
-          Release notes, feature announcements, and development updates.
+      <header class="mb-16">
+        <h1 class="text-5xl md:text-6xl text-ink m-0">Blog</h1>
+        <p class="mt-5 text-lg text-ink-2 max-w-[52ch] leading-relaxed">
+          The longer stories behind the releases. For the play-by-play,
+          see the <a href="/changelog" class="text-ember-bright hover:text-ink transition-colors underline underline-offset-4 decoration-[rgba(242,181,74,0.35)]">changelog</a>.
         </p>
       </header>
 
-      <!-- Posts: 2-col max, editorial feel -->
       {posts.length === 0 ? (
-        <p class="text-text-muted">No posts yet.</p>
+        <p class="text-ink-3">Nothing here yet. The first post is being dictated.</p>
       ) : (
-        <div class="grid md:grid-cols-2 gap-6">
-          {posts.map((post, i) => (
-            <a
-              href={`/blog/${post.id}`}
-              class={`group block reveal delay-${Math.min(i + 1, 4)}`}
-            >
-              <article class="h-full p-0.5 bg-surface border border-border rounded-[2rem] hover:border-accent/25 transition-colors duration-500">
-                <div class="h-full bg-cream rounded-[calc(2rem-2px)] p-8 md:p-10 flex flex-col gap-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-
-                  <!-- Meta -->
-                  <div class="flex items-center justify-between gap-3">
-                    <time
-                      datetime={post.data.date.toISOString()}
-                      class="text-xs font-mono text-text-muted tracking-wider"
-                    >
-                      {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </time>
-                    {post.data.version && (
-                      <span class="text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-full bg-accent-subtle text-accent border border-accent/20">
-                        v{post.data.version}
-                      </span>
-                    )}
-                  </div>
-
-                  <!-- Title & excerpt -->
-                  <div class="flex-1 space-y-3">
-                    <h2 class="text-xl md:text-2xl font-bold tracking-tight text-text-primary leading-snug group-hover:text-accent transition-colors duration-200">
-                      {post.data.title}
-                    </h2>
-                    <p class="text-sm text-text-secondary line-clamp-3 leading-relaxed">
-                      {post.data.description}
-                    </p>
-                  </div>
-
-                  <!-- CTA -->
-                  <div class="flex items-center gap-1.5 text-sm font-medium text-accent group-hover:gap-2.5 transition-all duration-200">
-                    Read more
-                    <Icon name="arrow-right" size={14} />
-                  </div>
-
-                </div>
-              </article>
+        <div class="flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-y border-[rgba(240,233,225,0.07)]">
+          {posts.map(post => (
+            <a href={`/blog/${post.id}`} class="group py-9 block">
+              <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-3">
+                <time datetime={post.data.date.toISOString()} class="data text-ink-3">
+                  {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                </time>
+                {post.data.version && (
+                  <span class="data text-ember-bright">v{post.data.version}</span>
+                )}
+              </div>
+              <h2 class="text-2xl md:text-[1.75rem] text-ink group-hover:text-ember-bright transition-colors duration-200 m-0 leading-snug">
+                {post.data.title}
+              </h2>
+              <p class="mt-3 text-[0.9375rem] text-ink-2 leading-relaxed max-w-2xl m-0">
+                {post.data.description}
+              </p>
             </a>
           ))}
         </div>
@@ -86,4 +56,3 @@ const description = 'Release notes, updates, and announcements for Pindrop.';
 
   <Footer />
 </Layout>
-

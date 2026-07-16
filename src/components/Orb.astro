@@ -1,0 +1,177 @@
+---
+/**
+ * The Orb — Pindrop's floating dictation indicator, rebuilt for the web.
+ * Canvas blob that breathes while idle and swells with real audio input.
+ * A CSS-gradient sphere renders first so the mark exists without JS;
+ * the canvas takes over when the custom element upgrades.
+ */
+interface Props {
+  /** Diameter in px. Omit to fill the parent element. */
+  size?: number;
+  class?: string;
+}
+
+const { size, class: className = '' } = Astro.props;
+const sizeStyle = size ? `width:${size}px;height:${size}px` : 'width:100%;height:100%';
+---
+
+<pin-orb class={`block relative ${className}`} style={sizeStyle}>
+  <span
+    class="orb-static absolute inset-[6%] rounded-full"
+    style="background: radial-gradient(circle at 36% 32%, #FFE9BC 0%, #FCD07E 34%, #F2B54A 58%, #B06A24 82%, #713413 100%);"
+    aria-hidden="true"
+  ></span>
+  <!-- Canvas overflows the element so the emitted light never clips at a square edge. -->
+  <canvas class="absolute left-[-45%] top-[-45%] w-[190%] h-[190%] pointer-events-none" aria-hidden="true"></canvas>
+</pin-orb>
+
+<script>
+  class PinOrb extends HTMLElement {
+    private ctx: CanvasRenderingContext2D | null = null;
+    private raf = 0;
+    private running = false;
+    private t = Math.random() * 100;
+    private phases: number[] = [];
+    private speeds: number[] = [];
+    /** Smoothed audio level, 0..1. Written from outside via setAudio(). */
+    private level = 0;
+    private targetLevel = 0;
+    private reduced = false;
+
+    connectedCallback() {
+      const canvas = this.querySelector('canvas');
+      if (!canvas) return;
+      this.ctx = canvas.getContext('2d');
+      if (!this.ctx) return;
+
+      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const N = 14;
+      for (let i = 0; i < N; i++) {
+        this.phases.push(Math.random() * Math.PI * 2);
+        this.speeds.push(0.55 + Math.random() * 0.5);
+      }
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      this.ctx.scale(dpr, dpr);
+
+      const staticOrb = this.querySelector('.orb-static') as HTMLElement | null;
+      if (staticOrb) staticOrb.style.display = 'none';
+
+      // Always paint a first frame so the orb exists before any scrolling.
+      this.draw(rect.width, rect.height);
+      if (this.reduced) return;
+
+      // Only animate while visible.
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) this.start(rect.width, rect.height);
+          else this.stop();
+        }
+      });
+      io.observe(this);
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) this.stop();
+        else if (this.isConnected) this.start(rect.width, rect.height);
+      });
+    }
+
+    disconnectedCallback() {
+      this.stop();
+    }
+
+    /** Feed a 0..1 audio level; the orb swells toward it. */
+    setAudio(level: number) {
+      this.targetLevel = Math.max(0, Math.min(1, level));
+    }
+
+    private start(w: number, h: number) {
+      if (this.running) return;
+      this.running = true;
+      const loop = () => {
+        if (!this.running) return;
+        this.t += 0.016;
+        // Ease the level so speech reads as a swell, not a twitch.
+        this.level += (this.targetLevel - this.level) * 0.18;
+        this.draw(w, h);
+        this.raf = requestAnimationFrame(loop);
+      };
+      this.raf = requestAnimationFrame(loop);
+    }
+
+    private stop() {
+      this.running = false;
+      cancelAnimationFrame(this.raf);
+    }
+
+    private draw(w: number, h: number) {
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const cx = w / 2;
+      const cy = h / 2;
+      // The canvas is 170% of the element; the blob fills the element itself
+      // and the extra margin carries the emitted light.
+      const base = (Math.min(w, h) / 2) * (0.45 + this.level * 0.07);
+      const breath = Math.sin(this.t * 0.9) * 0.022;
+      const wobble = 0.03 + this.level * 0.16;
+      const N = this.phases.length;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Emitted light: warm, organic falloff that breathes with the blob.
+      const glowR = base * (1.55 + breath * 3 + this.level * 0.4);
+      const glow = ctx.createRadialGradient(cx, cy, base * 0.4, cx, cy, glowR);
+      glow.addColorStop(0, 'rgba(242, 181, 74, 0.28)');
+      glow.addColorStop(0.6, 'rgba(242, 181, 74, 0.10)');
+      glow.addColorStop(1, 'rgba(242, 181, 74, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Blob outline: layered sines per vertex, drawn as a smooth loop.
+      const pts: [number, number][] = [];
+      for (let i = 0; i < N; i++) {
+        const a = (i / N) * Math.PI * 2;
+        const n =
+          Math.sin(this.t * this.speeds[i] + this.phases[i]) * 0.6 +
+          Math.sin(this.t * this.speeds[i] * 1.7 + this.phases[i] * 2.3) * 0.4;
+        const r = base * (1 + breath + n * wobble);
+        pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+      }
+
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const [x1, y1] = pts[i];
+        const [x2, y2] = pts[(i + 1) % N];
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        if (i === 0) ctx.moveTo(mx, my);
+        else ctx.quadraticCurveTo(x1, y1, mx, my);
+      }
+      const [lx, ly] = pts[0];
+      const [nx, ny] = pts[1];
+      ctx.quadraticCurveTo(lx, ly, (lx + nx) / 2, (ly + ny) / 2);
+      ctx.closePath();
+
+      // The amber→russet jewel, lit from the upper left (Pindrop theme).
+      const fill = ctx.createRadialGradient(
+        cx - base * 0.3, cy - base * 0.34, base * 0.1,
+        cx, cy, base * 1.15
+      );
+      fill.addColorStop(0, '#FFE9BC');
+      fill.addColorStop(0.35, '#FCD07E');
+      fill.addColorStop(0.6, '#F2B54A');
+      fill.addColorStop(0.85, '#B06A24');
+      fill.addColorStop(1, '#713413');
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+  }
+
+  if (!customElements.get('pin-orb')) {
+    customElements.define('pin-orb', PinOrb);
+  }
+</script>

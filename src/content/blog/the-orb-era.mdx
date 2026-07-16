@@ -1,0 +1,109 @@
+---
+title: "The Orb, four engines, and a full redesign: catching up on Pindrop"
+description: "Eleven releases since March. Streaming transcription, a rebuilt Library, thirty interface languages, and a privacy stance you can audit."
+date: 2026-07-15
+version: "1.22.0"
+tags: ["release", "roundup"]
+---
+
+The blog went quiet after v1.11. The app did the opposite: eleven releases
+between March and this week, including the two biggest updates Pindrop has
+ever shipped. If you only read one catch-up post, make it this one. If you
+want the play-by-play instead, this site now has a proper
+[changelog](/changelog) that gets updated with every release.
+
+## The app got a new face
+
+Version 1.19 introduced the **Orb**: a living, audio-reactive indicator that
+breathes while idle, swells when you speak, and streams your words next to it
+as you dictate. It replaced the old pill and dot indicators as the default,
+and it has become the face of the app. (If you preferred the quieter styles,
+1.21 brought back a discreet notch pill and a bubble that follows your caret.)
+
+Then 1.20 rebuilt everything around it. The release went by the codename
+*Scorched Earth* internally, and it earned it: a focused sidebar, a new Home
+dashboard, a rebuilt Library, standalone Settings, and polished onboarding.
+Updates now greet you with an in-app What's New sheet, so you can see what
+changed without hunting through release notes.
+
+## Words appear as you say them
+
+Transcription used to be something that happened after you stopped talking.
+Three engine additions changed that:
+
+- **Nemotron streaming** (1.19) shows words the moment you say them, with
+  tentative text that settles into place as recognition commits. The engine
+  prewarms at launch, so your first dictation starts without a spin-up delay.
+- **SenseVoice** (1.21) brings fast, fully local multilingual recognition
+  via FunASR's SenseVoice-Small model.
+- **Apple's on-device speech** (1.18) is now built in as a zero-download
+  option using the macOS system recognizer.
+
+Together with WhisperKit and the Parakeet models that have been on board
+since the 1.x early days, that makes five local engines. Pick accuracy,
+latency, language coverage, or zero setup per task. Long dictations also got
+optional on-device paragraph formatting in 1.21, which breaks walls of
+spoken text into readable paragraphs.
+
+## Pindrop learned some languages
+
+In March, Pindrop spoke English. Today the interface ships in more than
+thirty languages, with full right-to-left layout support, and dictation
+gained Russian and Ukrainian (thanks to [@nezzard](https://github.com/nezzard)),
+plus Polish, Hindi, and Malayalam in 1.21.
+
+Contributor work landed in the audio stack too:
+[@ntdkhang](https://github.com/ntdkhang) helped track down why Bluetooth
+headphones as output would break external microphone input. Since 1.19,
+your mic no longer follows your output route.
+
+## A Library that earns the name
+
+The rebuilt Library from 1.20 is where dictations actually live now: browse,
+search, sort, replay, edit, export. Around it grew a set of features for
+people who dictate a lot:
+
+- **Speaker profiles**: for meeting and imported-media transcripts, train a
+  voice once and diarization labels who said what, with offline global
+  clustering keeping labels consistent.
+- **Notes and dictionary**: spoken notes with interactive checklists, and a
+  custom vocabulary with match modes and usage-aware transcription bias.
+- **Activity insights**: streaks, word counts, destinations, and yearly
+  trends on the Home view.
+- **Audio retention**: keep recordings at native quality with configurable
+  cleanup, waveform previews, and per-recording export.
+- **Editable transcripts and pipeline insights** (1.22): fix a saved
+  transcript in place, and inspect stage-by-stage timing for any dictation.
+
+## Privacy you can check
+
+1.22 added optional diagnostics through TelemetryDeck, and the design
+matters more than the feature: it is **off until you opt in**, it reports
+bucketed timing and token metrics rather than transcript content, and the
+separate training-contribution workflow is local-only. You can review,
+export, or delete every redacted transcript pair on your machine, and
+uploading is disabled in the app, full stop.
+
+None of this asks for trust. The code is MIT-licensed and
+[on GitHub](https://github.com/watzon/pindrop), so the claims are checkable.
+
+## Odds and ends worth knowing
+
+- An embedded **MCP server** (1.18) lets AI tools drive Pindrop in agent
+  workflows.
+- Update windows now show **release notes in-app** before you install.
+- Text insertion works reliably **inside virtual machines** (1.21), and a
+  dedicated **cancel hotkey** stops a recording mid-flight.
+- Pindrop can **launch silently** in the menu bar without opening the main
+  window.
+
+## And this site is new too
+
+If you're reading this anywhere near July 2026, you're looking at a rebuilt
+pindrop.dev: a design that finally matches the app's Orb era, and a
+[changelog](/changelog) that stays current as part of the release process
+itself.
+
+[Download Pindrop](https://github.com/watzon/pindrop/releases/latest) if
+you haven't tried it, or update from inside the app. It's free, it's yours,
+and it still never phones home.

@@ -2,71 +2,72 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import Button from '../components/Button.astro';
 import Icon from '../components/Icon.astro';
+import HeroDictation from '../components/HeroDictation.astro';
+import AppWindow from '../components/AppWindow.astro';
+import Orb from '../components/Orb.astro';
+import { getCollection } from 'astro:content';
+import { getLatestRelease } from '../utils/github';
 
-let latestVersion = 'v1.0';
-let downloadUrl = 'https://github.com/watzon/pindrop/releases/latest';
-try {
-  const response = await fetch('https://api.github.com/repos/watzon/pindrop/releases/latest');
-  if (response.ok) {
-    const data = await response.json();
-    latestVersion = data.tag_name || 'v1.0';
-    const dmgAsset = data.assets?.find((asset: any) => asset.name.endsWith('.dmg'));
-    if (dmgAsset?.browser_download_url) {
-      downloadUrl = dmgAsset.browser_download_url;
-    }
-  }
-} catch (e) {}
+const { version, downloadUrl, dmgSizeMB } = await getLatestRelease();
 
-const features = [
-  {
-    title: 'Global Hotkeys',
-    description: 'Trigger dictation from anywhere with a fully customizable shortcut. Toggle mode or use push-to-talk for hands-free control.',
-    icon: 'keyboard',
-    stat: '1 keypress',
-    statLabel: 'to start dictating',
-  },
-  {
-    title: 'Transcription History',
-    description: 'Search your past dictations, copy to clipboard, or export to text files. Nothing is ever lost.',
-    icon: 'mic',
-    stat: 'Searchable',
-    statLabel: 'full history',
-  },
-  {
-    title: 'Multiple Models',
-    description: 'Choose your speed-vs-accuracy tradeoff. From Tiny (blazing fast) to Large (broadcast quality).',
-    icon: 'zap',
-    stat: '5 models',
-    statLabel: 'to choose from',
-  },
-  {
-    title: 'Custom Vocabulary',
-    description: 'Add domain-specific words and phrases. Medical, legal, technical—teach it your language.',
-    icon: 'sparkles',
-    stat: 'Unlimited',
-    statLabel: 'custom entries',
-  },
+const releases = (await getCollection('changelog'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || b.data.version.localeCompare(a.data.version, undefined, { numeric: true }))
+  .slice(0, 3);
+
+/** First bold item under "What's New" — the release's own headline. */
+function highlightOf(body: string | undefined): string {
+  if (!body) return '';
+  const m = body.match(/^- \*\*(.+?)\*\*/m);
+  if (m) return m[1].replace(/[:.]$/, '');
+  const first = body.split('\n').find(l => l.startsWith('- '));
+  return first ? first.slice(2).split('.')[0] : '';
+}
+
+const engines = [
+  { name: 'nemotron', tag: 'Live streaming', detail: 'Powers live dictation: words appear as you speak, with tentative text that settles into place. Prewarmed at launch.' },
+  { name: 'whisperkit', tag: 'Whisper on CoreML', detail: 'The accuracy pick for recordings. Every Whisper size up to large-v3 turbo, on the Neural Engine.' },
+  { name: 'parakeet', tag: 'NVIDIA Parakeet TDT', detail: 'Near-instant transcription with standout accuracy, via CoreML ports.' },
+  { name: 'sensevoice', tag: 'SenseVoice-Small (FunASR)', detail: 'Ultra-fast multilingual recognition with built-in punctuation.' },
+  { name: 'apple speech', tag: 'Built into macOS', detail: 'The system recognizer. Nothing extra to download.' },
+];
+
+const whileSpeaking = [
+  { title: 'One hotkey, any app', detail: 'Toggle or push-to-talk from wherever you\'re typing. There is a cancel hotkey too.' },
+  { title: 'Words land live', detail: 'Streaming transcription in the indicator of your choice: the Orb, a pill, a flash under the notch, or a bubble at your caret.' },
+  { title: 'Types straight into the field', detail: 'Direct Unicode insertion wherever your cursor is. Dvorak-safe, VM-safe.' },
+  { title: 'Knows your vocabulary', detail: 'A custom dictionary with match modes biases recognition toward the terms you actually say.' },
+];
+
+const afterStopping = [
+  { title: 'A real Library', detail: 'Every dictation is searchable, replayable, editable, and exportable.' },
+  { title: 'Meetings and media', detail: 'Transcribe recordings and imported files; diarization labels who said what, and trained voices stay recognized.' },
+  { title: 'Optional AI cleanup', detail: 'Polish transcripts with your own API key, or fully locally via Ollama or LM Studio.' },
+  { title: 'Notes and stats', detail: 'Spoken notes with checklists, plus streaks, word counts, and trends.' },
+];
+
+const ledger = [
+  { what: 'Your audio', answer: 'Transcribed on-device, then kept locally or discarded. Retention is your setting, not ours.' },
+  { what: 'Your transcripts', answer: 'A SwiftData store in Application Support. Search it, export it, delete it.' },
+  { what: 'Telemetry', answer: 'Off. Stays off until you opt in, and never includes transcript content.' },
+  { what: 'AI enhancement', answer: 'Optional. Run it locally with Ollama or LM Studio, or bring your own API key.' },
+  { what: 'The code', answer: 'All of it, MIT-licensed, on GitHub. Audit the claims yourself.' },
 ];
 
 const comparison = [
-  { feature: 'Pricing',            pindrop: 'Free & Open Source',   handy: 'Free (MIT)',          openwhispr: 'Free + $6.67/mo Pro', superwhisper: '$8.49/mo or $249 lifetime' },
-  { feature: 'Platform',           pindrop: 'macOS 14+',            handy: 'Mac, Win, Linux',     openwhispr: 'Mac, Win, Linux',      superwhisper: 'Mac, Win, iOS' },
-  { feature: 'Native App',         pindrop: 'Swift / SwiftUI',      handy: 'Rust / Tauri',        openwhispr: 'Tauri',                superwhisper: 'Swift / SwiftUI' },
-  { feature: 'ML Engine',          pindrop: 'WhisperKit (CoreML)',  handy: 'whisper.cpp',         openwhispr: 'whisper.cpp',          superwhisper: 'llama.cpp' },
-  { feature: 'Transcription Log',  pindrop: true,  handy: true,  openwhispr: true,  superwhisper: true },
-  { feature: 'AI Enhancement',     pindrop: true,  handy: false, openwhispr: true,  superwhisper: true },
-  { feature: 'Custom Vocabulary',  pindrop: true,  handy: false, openwhispr: true,  superwhisper: true },
-  { feature: 'Diarization',        pindrop: true,  handy: false, openwhispr: false, superwhisper: true },
-  { feature: 'Media Transcription',pindrop: true,  handy: false, openwhispr: true,  superwhisper: true },
-  { feature: 'Push-to-Talk',       pindrop: true,  handy: true,  openwhispr: true,  superwhisper: true },
-  { feature: 'Direct Text Insert', pindrop: true,  handy: 'Clipboard', openwhispr: true, superwhisper: true },
-  { feature: 'Open Source',        pindrop: 'MIT', handy: 'MIT', openwhispr: 'MIT', superwhisper: false },
+  { feature: 'Pricing',            pindrop: 'Free & Open Source', handy: 'Free (MIT)',          openwhispr: 'Free + $6.67/user/mo Pro',             superwhisper: 'Free + $8.49/mo · $84.99/yr · $249.99 lifetime' },
+  { feature: 'Platform',           pindrop: 'macOS 14+',           handy: 'macOS, Windows, Linux', openwhispr: 'macOS 12+, Windows 10+, Linux',       superwhisper: 'macOS, Windows, iOS' },
+  { feature: 'App framework',       pindrop: 'Swift / SwiftUI',     handy: 'Rust / Tauri',      openwhispr: 'Electron / React',                    superwhisper: 'Proprietary native apps' },
+  { feature: 'ML Engine',          pindrop: '5 local engines',     handy: 'Whisper / Parakeet', openwhispr: 'Whisper / Parakeet / cloud',          superwhisper: 'Whisper / Parakeet / cloud' },
+  { feature: 'Transcription Log',  pindrop: true,  handy: true,          openwhispr: true,          superwhisper: true },
+  { feature: 'AI Enhancement',     pindrop: true,  handy: 'Experimental', openwhispr: true,          superwhisper: true },
+  { feature: 'Custom Vocabulary',  pindrop: true,  handy: true,          openwhispr: true,          superwhisper: true },
+  { feature: 'Diarization',        pindrop: true,  handy: false,         openwhispr: 'Business+',   superwhisper: true },
+  { feature: 'Media Transcription',pindrop: true,  handy: false,         openwhispr: true,          superwhisper: true },
+  { feature: 'Push-to-Talk',       pindrop: true,  handy: true,          openwhispr: true,          superwhisper: true },
+  { feature: 'Direct Text Insert', pindrop: true,  handy: 'Clipboard / direct input', openwhispr: true, superwhisper: true },
+  { feature: 'Open Source',        pindrop: 'MIT',  handy: 'MIT', openwhispr: 'MIT', superwhisper: false },
 ];
-
-// Waveform bar heights (organic-looking)
-const waveformBars = [22,48,68,90,55,30,78,52,34,85,45,24,72,96,42,62,20,54,82,36,64,88,42,76,28,52,86,44,70,26,60,92];
 
 const softwareSchema = {
   "@context": "https://schema.org",
@@ -74,12 +75,16 @@ const softwareSchema = {
   "name": "Pindrop",
   "applicationCategory": "ProductivityApplication",
   "operatingSystem": "macOS",
-  "softwareVersion": latestVersion,
+  "softwareVersion": version,
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "downloadUrl": downloadUrl,
-  "featureList": features.map(f => f.title).join(", "),
+  "featureList": "Streaming transcription, Global hotkeys, Speaker diarization, Custom vocabulary, AI enhancement, Transcription library",
   "author": { "@type": "Organization", "name": "Pindrop" }
 };
+
+function cell(value: boolean | string, isPindrop: boolean) {
+  return { value, isPindrop };
+}
 ---
 
 <Layout title="Pindrop — Mac-Native AI Dictation">
@@ -89,425 +94,248 @@ const softwareSchema = {
 
 <main>
 
-  <!-- ─── Hero ────────────────────────────────────────────── -->
-  <section class="min-h-dvh flex items-center px-6 pt-28 pb-20">
-    <div class="max-w-6xl mx-auto w-full">
-      <div class="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
+  <!-- ─── Hero: a dictation in progress ──────────────────── -->
+  <section class="min-h-dvh flex items-center px-6 pt-28 pb-16">
+    <div class="max-w-5xl mx-auto w-full">
 
-        <!-- Left: copy -->
-        <div class="space-y-8">
-          <div class="badge animate-fade-up">
-            <span class="relative flex h-2 w-2 shrink-0">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-70"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-            </span>
-            {latestVersion} — Now Available
-          </div>
+      <HeroDictation />
 
-          <h1 class="text-5xl md:text-6xl lg:text-[3.75rem] xl:text-7xl font-bold tracking-tight text-text-primary leading-[1.06] animate-fade-up delay-100">
-            Dictation that
-            <br />
-            <span class="text-accent">respects you</span>
-          </h1>
-
-          <p class="text-lg md:text-xl text-text-secondary leading-relaxed max-w-[46ch] animate-fade-up delay-200">
-            Lightning-fast voice typing powered by on-device AI.
-            Optimized for Apple Silicon. Zero data ever leaves your machine.
-          </p>
-
-          <div class="flex flex-wrap items-center gap-3 animate-fade-up delay-300">
-            <a
-              href={downloadUrl}
-              data-download-trigger={downloadUrl}
-              onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
-              class="inline-flex items-center gap-2.5 bg-dark text-dark-text font-semibold px-7 py-3.5 rounded-full hover:bg-dark-surface transition-all duration-300 active:scale-[0.97] shadow-sm hover:shadow-md"
-            >
-              <Icon name="download" size={18} />
-              Download for macOS
-            </a>
-            <a
-              href="https://github.com/watzon/pindrop"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2.5 bg-cream border border-border text-text-primary font-medium px-6 py-3.5 rounded-full hover:bg-surface hover:border-border-strong transition-all duration-300 active:scale-[0.97]"
-            >
-              <Icon name="github" size={18} />
-              View Source
-            </a>
-          </div>
-
-          <p class="text-sm text-text-muted animate-fade-up delay-400">
-            Requires macOS 14 Sonoma or later &middot; Apple Silicon recommended
-          </p>
+      <div class="mt-12">
+        <div class="flex flex-wrap items-center gap-x-7 gap-y-4">
+          <a
+            href={downloadUrl}
+            data-download-trigger={downloadUrl}
+            onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
+            class="btn-primary"
+          >
+            <Icon name="download" size={17} />
+            Download for macOS
+          </a>
+          <a
+            href="https://github.com/watzon/pindrop"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-quiet text-sm"
+          >
+            <Icon name="github" size={15} />
+            View source
+          </a>
         </div>
-
-        <!-- Right: App mockup -->
-        <div class="relative animate-fade-up delay-200">
-          <!-- Glow behind card -->
-          <div class="absolute -inset-8 bg-linear-to-tr from-accent/8 via-transparent to-accent-light/12 rounded-[3rem] blur-3xl pointer-events-none"></div>
-
-          <!-- Outer bezel -->
-          <div class="relative p-0.5 bg-black/4 border border-black/[0.07] rounded-[2rem] shadow-diffuse">
-            <!-- Inner card -->
-            <div class="bg-dark rounded-[calc(2rem-2px)] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-
-              <!-- Mac window chrome -->
-              <div class="flex items-center gap-2 px-5 py-4 border-b border-white/6">
-                <div class="w-3 h-3 rounded-full bg-red-400/80"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
-                <div class="w-3 h-3 rounded-full bg-green-400/80"></div>
-                <div class="flex-1 flex justify-center">
-                  <span class="text-dark-muted text-xs font-mono tracking-wider">Pindrop</span>
-                </div>
-              </div>
-
-              <div class="px-6 py-7 space-y-6">
-
-                <!-- Recording status -->
-                <div class="flex items-center gap-3">
-                  <div class="relative flex h-2.5 w-2.5 shrink-0">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent"></span>
-                  </div>
-                  <span class="text-dark-muted text-xs font-mono tracking-widest uppercase">Recording — 0:14</span>
-                  <span class="ml-auto text-dark-muted text-xs font-mono">Whisper Large</span>
-                </div>
-
-                <!-- Waveform -->
-                <div class="flex items-center gap-[3px] h-12">
-                  {waveformBars.map((h, i) => (
-                    <div
-                      class="waveform-bar bg-accent/50"
-                      style={`height:${h}%;animation-duration:${0.7 + (i % 7) * 0.11}s;animation-delay:${i * 40}ms`}
-                    ></div>
-                  ))}
-                </div>
-
-                <!-- Live transcript -->
-                <div class="space-y-2 border-t border-white/6 pt-5">
-                  <p class="text-dark-muted text-[11px] font-mono uppercase tracking-widest">Live transcript</p>
-                  <p class="text-dark-text text-sm leading-relaxed">
-                    "The quarterly results show a notable improvement across all product verticals. Revenue is up 23% year over year, driven primarily by..."
-                  </p>
-                </div>
-
-                <!-- Bottom row -->
-                <div class="flex items-center justify-between pt-2">
-                  <div class="flex items-center gap-2 text-dark-muted text-xs font-mono">
-                    <Icon name="shield" size={12} />
-                    100% on-device
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 rounded-full bg-accent/60"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-accent/40"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-accent/20"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ─── Value Props ──────────────────────────────────────── -->
-  <section class="py-20 px-6 bg-dark">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/7">
-
-        <div class="flex flex-col gap-3 px-0 sm:px-8 py-10 sm:py-0 first:pl-0 last:pr-0">
-          <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 text-accent flex items-center justify-center">
-            <Icon name="apple" size={18} />
-          </div>
-          <h3 class="font-semibold text-dark-text text-base">Mac-Native</h3>
-          <p class="text-dark-muted text-sm leading-relaxed">
-            Built with Swift and SwiftUI. Not a web wrapper — feels at home on macOS.
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-3 px-0 sm:px-8 py-10 sm:py-0">
-          <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 text-accent flex items-center justify-center">
-            <Icon name="shield" size={18} />
-          </div>
-          <h3 class="font-semibold text-dark-text text-base">Privacy-First</h3>
-          <p class="text-dark-muted text-sm leading-relaxed">
-            100% local transcription. Your voice never leaves your Mac. No cloud, ever.
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-3 px-0 sm:px-8 py-10 sm:py-0">
-          <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 text-accent flex items-center justify-center">
-            <Icon name="zap" size={18} />
-          </div>
-          <h3 class="font-semibold text-dark-text text-base">Apple Silicon</h3>
-          <p class="text-dark-muted text-sm leading-relaxed">
-            Runs on the Neural Engine. 2–3× faster than CPU-bound alternatives.
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-3 px-0 sm:px-8 py-10 sm:py-0 last:pr-0">
-          <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 text-accent flex items-center justify-center">
-            <Icon name="sparkles" size={18} />
-          </div>
-          <h3 class="font-semibold text-dark-text text-base">Open Source</h3>
-          <p class="text-dark-muted text-sm leading-relaxed">
-            MIT license. No subscriptions, no hidden costs, no lock-in. Forever.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ─── CoreML Section ───────────────────────────────────── -->
-  <section class="py-32 px-6">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid lg:grid-cols-2 gap-16 xl:gap-24 items-start">
-
-        <!-- Left: copy -->
-        <div class="reveal space-y-6">
-          <p class="tag">Under the hood</p>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-text-primary leading-tight">
-            Native CoreML,<br />not WebAssembly
-          </h2>
-          <p class="text-text-secondary leading-relaxed">
-            Cross-platform apps run Whisper inside WebAssembly — a sandboxed browser runtime.
-            Pindrop runs directly on Apple's Neural Engine via CoreML. This isn't just an
-            implementation detail; it fundamentally changes performance on every Mac.
-          </p>
-
-          <div class="space-y-5 pt-2">
-            {[
-              {
-                icon: 'zap',
-                title: 'Memory-Mapped Models',
-                body: 'Models are memory-mapped, not heap-loaded. The system pages unused portions to disk — no malloc pressure, no GC pauses.'
-              },
-              {
-                icon: 'apple',
-                title: 'Apple Neural Engine',
-                body: 'Transcription runs on dedicated ML accelerators, not general CPU. Better thermals and battery life.'
-              },
-              {
-                icon: 'shield',
-                title: 'Zero-Copy Audio',
-                body: 'Direct CoreML/Metal calls with no JS → WASM → native layers in between. Instant start, no warmup.'
-              },
-            ].map(item => (
-              <div class="flex gap-4 reveal">
-                <div class="w-9 h-9 shrink-0 rounded-xl bg-surface border border-border text-accent flex items-center justify-center mt-0.5">
-                  <Icon name={item.icon as any} size={16} />
-                </div>
-                <div>
-                  <h4 class="font-semibold text-text-primary text-sm mb-1">{item.title}</h4>
-                  <p class="text-sm text-text-secondary leading-relaxed">{item.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <!-- Right: contrast card -->
-        <div class="reveal delay-2">
-          <div class="p-0.5 bg-black/4 border border-black/6 rounded-[2rem]">
-            <div class="bg-dark rounded-[calc(2rem-2px)] p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <h4 class="text-dark-text font-semibold mb-2 text-base">WASM limitations you don't have</h4>
-              <p class="text-dark-muted text-xs mb-8">Cross-platform apps running whisper.cpp in WebAssembly</p>
-
-              <div class="space-y-0 divide-y divide-white/6">
-                {[
-                  ['WASM heap constraints', 'Entire model must fit in sandboxed memory'],
-                  ['ML acceleration',       'No direct access to CoreML or Neural Engine'],
-                  ['Audio pipeline',        'Piped through Web Audio API abstractions'],
-                  ['Warmup time',           'WASM compilation required on every startup'],
-                ].map(([label, val]) => (
-                  <div class="flex justify-between items-start gap-6 py-4">
-                    <span class="text-dark-muted text-sm shrink-0">{label}</span>
-                    <span class="text-dark-text/50 text-sm text-right leading-snug">{val}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ─── Features ────────────────────────────────────────── -->
-  <section id="features" class="py-32 px-6 bg-surface">
-    <div class="max-w-6xl mx-auto">
-
-      <div class="max-w-xl mb-20 reveal">
-        <p class="tag mb-4">Capabilities</p>
-        <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-text-primary leading-tight mb-5">
-          Everything voice productivity needs
-        </h2>
-        <p class="text-text-secondary leading-relaxed">
-          Powerful enough for power users, native enough to feel effortless.
+        <p class="data text-ink-3 mt-4 m-0">
+          {version}{dmgSizeMB ? ` · ${dmgSizeMB} MB` : ''} · macOS 14+
         </p>
       </div>
 
-      <!-- Asymmetric bento: 7/5 + 5/7 -->
-      <div class="grid lg:grid-cols-12 gap-5">
-        {features.map((feature, i) => {
-          const isWide = i % 2 === 0;
-          const colClass = isWide ? 'lg:col-span-7' : 'lg:col-span-5';
-          return (
-            <div class={`${colClass} reveal delay-${i + 1}`}>
-              <div class="group p-0.5 bg-cream border border-border rounded-[2rem] hover:border-accent/25 transition-colors duration-500 h-full">
-                <div class="bg-cream rounded-[calc(2rem-2px)] p-8 md:p-10 h-full flex flex-col gap-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                  <div class="flex items-start justify-between gap-4">
-                    <div class="w-11 h-11 rounded-2xl bg-surface border border-border text-accent flex items-center justify-center group-hover:bg-accent-subtle group-hover:border-accent/20 transition-colors duration-500">
-                      <Icon name={feature.icon as any} size={22} />
-                    </div>
-                    <div class="text-right">
-                      <div class="text-2xl font-bold tracking-tight text-text-primary">{feature.stat}</div>
-                      <div class="text-xs text-text-muted">{feature.statLabel}</div>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 class="text-xl font-bold text-text-primary mb-2 tracking-tight">{feature.title}</h3>
-                    <p class="text-text-secondary text-sm leading-relaxed">{feature.description}</p>
-                  </div>
-                </div>
-              </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Native: why CoreML, not a browser ──────────────── -->
+  <section class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <p class="font-display text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.2] text-ink max-w-3xl m-0">
+        Most dictation apps ship a browser pretending to be an app.
+        Pindrop is Swift, SwiftUI, and CoreML,
+        <em class="display-italic">straight onto the Neural Engine.</em>
+      </p>
+
+      <div class="mt-16 flex flex-col divide-y divide-[rgba(240,233,225,0.07)]">
+        {[
+          ['Neural Engine, not CPU', 'On Apple Silicon, transcription runs on dedicated ML hardware. Cooler, quieter, and kinder to your battery than CPU-bound Whisper ports.'],
+          ['Memory-mapped models', 'Models page in from disk instead of squatting on the heap. No sandbox memory ceiling, no GC pauses.'],
+          ['A short audio path', 'Microphone to CoreML with no JS, WASM, or Electron in between. Engines prewarm at launch, so first words don\'t wait.'],
+        ].map(([title, body]) => (
+          <div class="py-7 grid md:grid-cols-[16rem_1fr] gap-2 md:gap-10 md:items-baseline">
+            <h2 class="font-body text-base font-semibold text-ink m-0">{title}</h2>
+            <p class="text-[0.9375rem] text-ink-2 leading-relaxed m-0 max-w-xl">{body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Engines ────────────────────────────────────────── -->
+  <section class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl md:text-5xl text-ink m-0">Five engines. Your call.</h2>
+      <p class="mt-4 text-ink-2 max-w-[52ch] leading-relaxed">
+        All local. Accuracy, latency, languages, or zero setup: pick the
+        tradeoff per use, not per subscription tier.
+      </p>
+
+      <div class="mt-12 flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-y border-[rgba(240,233,225,0.07)]">
+        {engines.map(engine => (
+          <div class="py-6 grid md:grid-cols-[11rem_15rem_1fr] gap-1.5 md:gap-8 items-baseline">
+            <span class="data text-ember-bright">{engine.name}</span>
+            <span class="text-sm font-medium text-ink">{engine.tag}</span>
+            <p class="text-sm text-ink-2 leading-relaxed m-0">{engine.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── While you speak / after you stop ───────────────── -->
+  <section id="features" class="px-6 py-28">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-x-16 gap-y-16">
+
+      <div>
+        <h2 class="text-3xl md:text-4xl text-ink m-0">While you <em class="display-italic">speak</em></h2>
+        <div class="mt-8 flex flex-col divide-y divide-[rgba(240,233,225,0.06)] border-t border-[rgba(240,233,225,0.06)]">
+          {whileSpeaking.map(item => (
+            <div class="py-5">
+              <h3 class="font-body text-[0.9375rem] font-semibold text-ink m-0">{item.title}</h3>
+              <p class="text-sm text-ink-2 leading-relaxed m-0 mt-1.5">{item.detail}</p>
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-3xl md:text-4xl text-ink m-0">After you <em class="display-italic">stop</em></h2>
+        <div class="mt-8 flex flex-col divide-y divide-[rgba(240,233,225,0.06)] border-t border-[rgba(240,233,225,0.06)]">
+          {afterStopping.map(item => (
+            <div class="py-5">
+              <h3 class="font-body text-[0.9375rem] font-semibold text-ink m-0">{item.title}</h3>
+              <p class="text-sm text-ink-2 leading-relaxed m-0 mt-1.5">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ─── The app, as it actually looks ──────────────────── -->
+  <section class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <AppWindow />
+      <p class="data text-ink-3 mt-6 text-center">the Home view · every number on this screen lives on your Mac</p>
+    </div>
+  </section>
+
+
+  <!-- ─── The privacy ledger ─────────────────────────────── -->
+  <section class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl md:text-5xl text-ink m-0">What leaves your Mac</h2>
+      <p class="mt-4 font-display italic text-xl text-ink-3">Short answer: nothing you didn't send yourself.</p>
+
+      <div class="mt-12 flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-y border-[rgba(240,233,225,0.07)]">
+        {ledger.map(row => (
+          <div class="py-6 grid md:grid-cols-[13rem_1fr] gap-1.5 md:gap-10 md:items-baseline">
+            <span class="text-sm font-medium text-ink-3">{row.what}</span>
+            <p class="text-[0.9375rem] text-ink leading-relaxed m-0 max-w-2xl">
+              {row.what === 'The code'
+                ? <>All of it, MIT-licensed, <a href="https://github.com/watzon/pindrop" target="_blank" rel="noopener noreferrer" class="text-ember-bright hover:text-ink transition-colors underline underline-offset-4 decoration-[rgba(242,181,74,0.35)]">on GitHub</a>. Audit the claims yourself.</>
+                : row.answer}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 
 
-  <!-- ─── Comparison ──────────────────────────────────────── -->
-  <section id="comparison" class="py-32 px-6">
-    <div class="max-w-6xl mx-auto">
+  <!-- ─── Comparison ─────────────────────────────────────── -->
+  <section id="comparison" class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl md:text-5xl text-ink m-0 mb-12">How it compares</h2>
 
-      <div class="max-w-xl mb-16 reveal">
-        <p class="tag mb-4">How it stacks up</p>
-        <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-text-primary leading-tight">
-          Why Pindrop?
-        </h2>
-      </div>
-
-      <!-- Horizontally scrollable table -->
-      <div class="reveal relative overflow-x-auto -mx-6 px-6">
-        <div class="p-0.5 bg-black/3 border border-border rounded-[1.5rem] min-w-[700px]">
-          <div class="bg-cream rounded-[calc(1.5rem-2px)] overflow-hidden">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="border-b border-border">
-                  <th class="p-4 text-xs font-semibold uppercase tracking-widest text-text-muted w-[30%]">Feature</th>
-                  <th class="p-4 text-center border-l border-border bg-accent-subtle/50">
-                    <span class="text-sm font-bold text-accent">Pindrop</span>
-                  </th>
-                  <th class="p-4 text-center text-xs font-medium text-text-muted border-l border-border">Handy</th>
-                  <th class="p-4 text-center text-xs font-medium text-text-muted border-l border-border">OpenWhispr</th>
-                  <th class="p-4 text-center text-xs font-medium text-text-muted border-l border-border">SuperWhisper</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border">
-                {comparison.map((row) => (
-                  <tr class="group hover:bg-surface/50 transition-colors">
-                    <td class="p-4 text-sm font-medium text-text-secondary">{row.feature}</td>
-                    <td class="p-4 text-center border-l border-border bg-accent-subtle/30 group-hover:bg-accent-subtle/50 transition-colors">
-                      {typeof row.pindrop === 'boolean' ? (
-                        row.pindrop
-                          ? <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-accent text-white"><Icon name="check" size={11} /></span>
-                          : <span class="text-border-strong text-base font-light">—</span>
-                      ) : (
-                        <span class="text-sm font-semibold text-accent">{row.pindrop}</span>
-                      )}
-                    </td>
-                    <td class="p-4 text-center border-l border-border">
-                      {typeof row.handy === 'boolean' ? (
-                        row.handy
-                          ? <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-surface border border-border text-text-muted"><Icon name="check" size={11} /></span>
-                          : <span class="text-border-strong text-base font-light">—</span>
-                      ) : (
-                        <span class="text-xs text-text-muted">{row.handy}</span>
-                      )}
-                    </td>
-                    <td class="p-4 text-center border-l border-border">
-                      {typeof row.openwhispr === 'boolean' ? (
-                        row.openwhispr
-                          ? <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-surface border border-border text-text-muted"><Icon name="check" size={11} /></span>
-                          : <span class="text-border-strong text-base font-light">—</span>
-                      ) : (
-                        <span class="text-xs text-text-muted">{row.openwhispr}</span>
-                      )}
-                    </td>
-                    <td class="p-4 text-center border-l border-border">
-                      {typeof row.superwhisper === 'boolean' ? (
-                        row.superwhisper
-                          ? <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-surface border border-border text-text-muted"><Icon name="check" size={11} /></span>
-                          : <span class="text-border-strong text-base font-light">—</span>
-                      ) : (
-                        <span class="text-xs text-text-muted">{row.superwhisper}</span>
-                      )}
-                    </td>
-                  </tr>
+      <div class="overflow-x-auto -mx-6 px-6">
+        <table class="w-full min-w-[800px] text-left border-collapse">
+          <thead>
+            <tr>
+              <th class="py-3.5 pr-4 text-xs font-semibold uppercase tracking-wide text-ink-3 w-[26%] border-b border-[rgba(240,233,225,0.12)]">Feature</th>
+              <th class="py-3.5 px-4 text-sm font-semibold text-ink text-center bg-hearth rounded-t-lg border-b border-[rgba(240,233,225,0.12)]">Pindrop</th>
+              <th class="py-3.5 px-4 text-sm font-medium text-ink-3 text-center border-b border-[rgba(240,233,225,0.12)]">Handy</th>
+              <th class="py-3.5 px-4 text-sm font-medium text-ink-3 text-center border-b border-[rgba(240,233,225,0.12)]">OpenWhispr</th>
+              <th class="py-3.5 px-4 text-sm font-medium text-ink-3 text-center border-b border-[rgba(240,233,225,0.12)]">Superwhisper</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comparison.map((row, i) => {
+              const isLast = i === comparison.length - 1;
+              const rowBorder = isLast ? '' : 'border-b border-[rgba(240,233,225,0.05)]';
+              return (
+              <tr>
+                <td class={`py-3.5 pr-4 text-sm font-medium text-ink-2 ${rowBorder}`}>{row.feature}</td>
+                {[cell(row.pindrop, true), cell(row.handy, false), cell(row.openwhispr, false), cell(row.superwhisper, false)].map(({ value, isPindrop }) => (
+                  <td class={`py-3.5 px-4 text-center ${rowBorder} ${isPindrop ? `bg-hearth ${isLast ? 'rounded-b-lg' : ''}` : ''}`}>
+                    {typeof value === 'boolean' ? (
+                      value
+                        ? <Icon name="check" size={15} class={`inline ${isPindrop ? 'text-ember-bright' : 'text-ink-3'}`} />
+                        : <span class="text-ink-3 opacity-50">—</span>
+                    ) : (
+                      <span class={`text-[0.8125rem] ${isPindrop ? 'font-semibold text-ink' : 'text-ink-3'}`}>{value}</span>
+                    )}
+                  </td>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-
     </div>
   </section>
 
 
-  <!-- ─── CTA ─────────────────────────────────────────────── -->
-  <section class="py-32 px-6">
-    <div class="max-w-6xl mx-auto">
-      <div class="reveal p-0.5 bg-black/4 border border-border rounded-[2.5rem]">
-        <div class="bg-dark rounded-[calc(2.5rem-2px)] px-8 py-20 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+  <!-- ─── Fresh from the changelog ───────────────────────── -->
+  <section class="px-6 py-28">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-wrap items-baseline justify-between gap-4 mb-10">
+        <h2 class="text-4xl md:text-5xl text-ink m-0">Shipping, steadily</h2>
+        <a href="/changelog" class="btn-quiet text-sm">
+          Every release
+          <Icon name="arrow-right" size={14} />
+        </a>
+      </div>
 
-          <p class="tag-dark text-dark-muted text-xs uppercase tracking-widest font-medium mb-6 inline-flex items-center gap-2 border border-white/8 bg-white/4 px-3 py-1 rounded-full">
-            Free forever
-          </p>
+      <div class="flex flex-col divide-y divide-[rgba(240,233,225,0.07)] border-y border-[rgba(240,233,225,0.07)]">
+        {releases.map(release => (
+          <a
+            href={`/changelog#v${release.data.version}`}
+            class="group py-6 grid md:grid-cols-[7rem_9rem_1fr] gap-1.5 md:gap-8 items-baseline hover:bg-[rgba(240,233,225,0.02)] transition-colors duration-200 -mx-4 px-4 rounded-lg"
+          >
+            <span class="data text-ember-bright">v{release.data.version}</span>
+            <time datetime={release.data.date.toISOString()} class="data text-ink-3">
+              {release.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+            </time>
+            <span class="text-[0.9375rem] text-ink-2 group-hover:text-ink transition-colors duration-200 leading-relaxed">
+              {highlightOf(release.body)}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
 
-          <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-dark-text leading-tight mb-6 max-w-2xl mx-auto">
-            Ready for truly private dictation?
-          </h2>
 
-          <p class="text-dark-muted text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-            Join users who've moved to local, fast, and secure voice typing.
-            No account. No subscription. No data sharing.
-          </p>
-
-          <div class="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={downloadUrl}
-              data-download-trigger={downloadUrl}
-              onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
-              class="inline-flex items-center gap-2.5 bg-cream text-dark font-semibold px-8 py-4 rounded-full hover:bg-cream-dark transition-all duration-300 active:scale-[0.97] shadow-sm hover:shadow-lg"
-            >
-              <Icon name="download" size={18} />
-              Download Pindrop
-            </a>
-            <a
-              href="https://github.com/watzon/pindrop"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2.5 border border-white/15 text-dark-text font-medium px-6 py-4 rounded-full hover:bg-white/6 transition-all duration-300 active:scale-[0.97]"
-            >
-              <Icon name="github" size={18} />
-              Star on GitHub
-            </a>
-          </div>
-
-          <p class="text-dark-muted text-xs mt-8">macOS 14 Sonoma or later required</p>
-
-        </div>
+  <!-- ─── Close: the light source returns ────────────────── -->
+  <section class="px-6 pt-28 pb-8">
+    <div class="max-w-3xl mx-auto flex flex-col items-center text-center">
+      <Orb size={190} />
+      <h2 class="mt-10 text-4xl md:text-5xl text-ink m-0 leading-tight">
+        So quiet, you can hear a <em class="display-italic text-ember-bright">pin drop</em>.
+      </h2>
+      <p class="mt-5 text-ink-2 max-w-[46ch] leading-relaxed">
+        Your voice, your Mac, your transcripts. Nobody else in the room.
+      </p>
+      <div class="mt-10 flex flex-col items-center gap-4">
+        <a
+          href={downloadUrl}
+          data-download-trigger={downloadUrl}
+          onclick={`event.preventDefault(); window.openDownloadModal('${downloadUrl}')`}
+          class="btn-primary"
+        >
+          <Icon name="download" size={17} />
+          Download Pindrop
+        </a>
+        <span class="data text-ink-3">{version} · free forever · MIT</span>
       </div>
     </div>
   </section>

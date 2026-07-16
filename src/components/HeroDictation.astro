@@ -1,0 +1,198 @@
+---
+/**
+ * The hero is a dictation in progress. The headline types itself the way
+ * the app streams recognition (tentative → committed), with the Orb riding
+ * at the insertion point like Pindrop's caret indicator. The waveform murmurs
+ * while the words land, then settles.
+ */
+import Orb from './Orb.astro';
+---
+
+<hero-dictation class="block">
+  <h1 class="hl text-[clamp(3.25rem,8.5vw,7rem)] leading-[1.05] text-ink m-0">
+    <span class="hl-committed">You talk. It <em class="display-italic text-ember-bright">types.</em></span><span class="hl-tentative font-display"></span><span
+      class="inline-block w-[0.62em] h-[0.62em] ml-[0.18em] align-baseline translate-y-[0.06em]"
+    ><Orb /></span>
+  </h1>
+
+  <p class="mt-7 text-lg md:text-xl text-ink-2 max-w-[52ch] leading-relaxed">
+    Free, open-source dictation that runs entirely on your Mac.<br class="hidden sm:block" />
+    No cloud, no account, no subscription.
+  </p>
+
+  <canvas class="wave block w-full max-w-2xl h-8 mt-12" aria-hidden="true"></canvas>
+
+  <div class="mt-3 flex items-center gap-3 max-w-2xl" aria-hidden="true">
+    <span class="state-dot inline-block w-1.5 h-1.5 rounded-full bg-ember shrink-0"></span>
+    <span class="state-label data text-ink-3">recording</span>
+    <span class="timer data text-ink-3">00:00</span>
+    <span class="data text-ink-3 ml-auto">nemotron · streaming</span>
+  </div>
+</hero-dictation>
+
+<script>
+  const WORDS: { t: string; accent?: boolean }[] = [
+    { t: 'You' },
+    { t: 'talk.' },
+    { t: 'It' },
+    { t: 'types.', accent: true },
+  ];
+
+  class HeroDictation extends HTMLElement {
+    private committedEl!: HTMLElement;
+    private tentativeEl!: HTMLElement;
+    private timerEl!: HTMLElement;
+    private stateLabel!: HTMLElement;
+    private stateDot!: HTMLElement;
+    private wave!: HTMLCanvasElement;
+    private wctx!: CanvasRenderingContext2D;
+
+    private destroyed = false;
+    private typingTimeout = 0;
+    private timerInterval = 0;
+    private startedAt = 0;
+
+    private waveRaf = 0;
+    private waveT = 0;
+    /** 1 while "speaking" (typing), eases toward 0.3 once inserted. */
+    private energy = 1;
+    private energyTarget = 1;
+
+    connectedCallback() {
+      this.committedEl = this.querySelector('.hl-committed')!;
+      this.tentativeEl = this.querySelector('.hl-tentative')!;
+      this.timerEl = this.querySelector('.timer')!;
+      this.stateLabel = this.querySelector('.state-label')!;
+      this.stateDot = this.querySelector('.state-dot')!;
+      this.wave = this.querySelector('.wave')!;
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const ctx = this.wave.getContext('2d');
+      if (!ctx) return;
+      this.wctx = ctx;
+      this.sizeWave();
+      window.addEventListener('resize', () => this.sizeWave());
+
+      if (reduced) {
+        this.drawWave(0, 0.35);
+        this.setState('inserted');
+        return;
+      }
+
+      this.startWaveLoop();
+      this.typeHeadline();
+    }
+
+    disconnectedCallback() {
+      this.destroyed = true;
+      clearTimeout(this.typingTimeout);
+      clearInterval(this.timerInterval);
+      cancelAnimationFrame(this.waveRaf);
+    }
+
+    /* ── Headline typing (runs once per visit) ───────────── */
+
+    private renderHeadline(count: number, tentativeCount: number) {
+      const committed = WORDS.slice(0, count)
+        .map(w => w.accent
+          ? `<em class="display-italic text-ember-bright">${w.t}</em>`
+          : w.t)
+        .join(' ');
+      const tentative = WORDS.slice(count, count + tentativeCount).map(w => w.t).join(' ');
+      this.committedEl.innerHTML = committed;
+      this.tentativeEl.textContent = tentative ? ' ' + tentative : '';
+      this.tentativeEl.className = 'hl-tentative font-display italic text-ink-3';
+    }
+
+    private typeHeadline() {
+      this.startedAt = Date.now();
+      this.timerInterval = window.setInterval(() => {
+        const s = Math.floor((Date.now() - this.startedAt) / 1000);
+        this.timerEl.textContent =
+          `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      }, 1000);
+
+      let committed = 0;
+      this.renderHeadline(0, 0);
+
+      const step = () => {
+        if (this.destroyed) return;
+        if (committed < WORDS.length) {
+          // The next word arrives tentative, then commits as the one after lands.
+          this.renderHeadline(committed, 1);
+          this.typingTimeout = window.setTimeout(() => {
+            if (this.destroyed) return;
+            committed++;
+            this.renderHeadline(committed, 0);
+            this.typingTimeout = window.setTimeout(step, 210 + Math.random() * 190);
+          }, 300 + Math.random() * 220);
+        } else {
+          clearInterval(this.timerInterval);
+          this.setState('inserted');
+          this.energyTarget = 0.3;
+        }
+      };
+      this.typingTimeout = window.setTimeout(step, 500);
+    }
+
+    private setState(state: 'recording' | 'inserted') {
+      this.stateLabel.textContent = state;
+      this.stateDot.style.backgroundColor =
+        state === 'inserted' ? 'rgba(240,233,225,0.35)' : 'var(--color-ember)';
+    }
+
+    /* ── Waveform ────────────────────────────────────────── */
+
+    private sizeWave() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = this.wave.clientWidth;
+      const h = this.wave.clientHeight;
+      if (!w || !h) return;
+      this.wave.width = w * dpr;
+      this.wave.height = h * dpr;
+      this.wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    private startWaveLoop() {
+      const loop = () => {
+        if (this.destroyed) return;
+        this.waveT += 0.016;
+        this.energy += (this.energyTarget - this.energy) * 0.02;
+        this.drawWave(this.waveT, this.energy);
+        this.waveRaf = requestAnimationFrame(loop);
+      };
+      this.waveRaf = requestAnimationFrame(loop);
+    }
+
+    private drawWave(t: number, energy: number) {
+      const w = this.wave.clientWidth;
+      const h = this.wave.clientHeight;
+      const mid = h / 2;
+      const ctx = this.wctx;
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      const steps = Math.max(48, Math.floor(w / 6));
+      for (let s = 0; s <= steps; s++) {
+        const x01 = s / steps;
+        const speech =
+          Math.sin(x01 * 9 + t * 1.6) * 2.6 +
+          Math.sin(x01 * 23 - t * 1.1) * 1.4 +
+          Math.sin(x01 * 41 + t * 2.3) * 0.8;
+        const y = mid + speech * energy;
+        const x = x01 * w;
+        if (s === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'rgba(242, 181, 74, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+  }
+
+  if (!customElements.get('hero-dictation')) {
+    customElements.define('hero-dictation', HeroDictation);
+  }
+</script>

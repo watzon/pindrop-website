@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Orb from '../components/Orb.astro';
+---
+
+<Layout title="Page not found — Pindrop" noindex>
+  <Header />
+
+  <main class="min-h-dvh flex items-center px-6 py-32">
+    <div class="max-w-3xl mx-auto flex flex-col items-center text-center">
+      <Orb size={150} />
+      <p class="data text-ink-3 mt-10">404 · no transcription available</p>
+      <h1 class="mt-4 text-4xl md:text-5xl text-ink m-0">
+        Sorry, didn't catch that.
+      </h1>
+      <p class="mt-5 text-ink-2 max-w-[42ch] leading-relaxed">
+        The page you asked for doesn't exist, or moved somewhere quieter.
+      </p>
+      <a href="/" class="btn-primary mt-10">Back to the start</a>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

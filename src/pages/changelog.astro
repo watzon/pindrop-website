@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getCollection, render } from 'astro:content';
+
+const entries = (await getCollection('changelog')).sort(
+  (a, b) =>
+    b.data.date.valueOf() - a.data.date.valueOf() ||
+    b.data.version.localeCompare(a.data.version, undefined, { numeric: true })
+);
+
+const rendered = await Promise.all(
+  entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content }))
+);
+
+const title = 'Changelog';
+const description = 'Every Pindrop release, in order. New engines, new languages, fixes, and the occasional full redesign.';
+---
+
+<Layout title={`${title} — Pindrop`} description={description}>
+  <Header />
+
+  <main class="pt-36 pb-24 px-6">
+    <div class="max-w-4xl mx-auto">
+
+      <header class="mb-20">
+        <h1 class="text-5xl md:text-6xl text-ink m-0">Changelog</h1>
+        <p class="mt-5 text-lg text-ink-2 max-w-[52ch] leading-relaxed">
+          Every release since we started keeping score. Updated with each
+          version that ships; the app pulls the same notes into its update window.
+        </p>
+      </header>
+
+      <div class="flex flex-col gap-20">
+        {rendered.map(({ entry, Content }) => (
+          <article id={`v${entry.data.version}`} class="scroll-mt-28 grid md:grid-cols-[10rem_1fr] gap-6 md:gap-12">
+            <div class="md:sticky md:top-28 md:self-start flex md:flex-col items-baseline md:items-start gap-3 md:gap-1.5">
+              <a
+                href={`#v${entry.data.version}`}
+                class="data text-lg text-ember-bright hover:text-ink transition-colors duration-200"
+              >
+                v{entry.data.version}
+              </a>
+              <time datetime={entry.data.date.toISOString()} class="data text-ink-3">
+                {entry.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+              </time>
+            </div>
+            <div class="prose changelog-body min-w-0">
+              <Content />
+            </div>
+          </article>
+        ))}
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* Release notes open with an h2 ("What's New"); inside the timeline they
+     should read as section labels, not page headings. */
+  .changelog-body :global(h2) {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    margin-top: 2.25rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .changelog-body :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .changelog-body :global(li) {
+    font-size: 0.9375rem;
+  }
+</style>
